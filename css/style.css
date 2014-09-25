@@ -1,0 +1,81 @@
+body {
+	padding:10px;
+	border: 0px;
+	margin: 0px;
+	height: 100%;
+	font-family: 'Montserrat Alternates', sans-serif;
+	font-size: small;
+	background: #CCFF99;
+}
+#container {
+	margin: auto;
+    height: 615px;
+    width: 852px;
+    top: 100px;
+    left: 50%;
+	background: #A3CC7A;
+	-webkit-border-radius: 8px 8px 8px 8px;
+	border-radius: 8px 8px 8px 8px;
+}
+#divTitulo {
+	margin-left: 25px;
+	height:60px;
+	width: 600px;
+	line-height: 60px;
+}
+#titulo {
+	font-size: 25px;
+	color: #fff;
+	text-shadow: 1px 1px 0 #52663D;
+}
+#map {
+	margin-left:25px;
+	width: 800px;
+	height: 500px;
+	border: 1px solid #fff;
+}
+.button {
+	cursor: pointer;
+	border: 1px solid #fff;
+	position: relative;
+	float: left;
+	color: #fff;
+	text-shadow: 1px 1px 0 #52663D;
+	text-align: center;
+	width: 265px;
+	height: 35px;
+	line-height:35px;
+	background: #7A995C;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+#Previous {
+	margin-left:25px;
+	-webkit-border-radius: 0 0 0 8px;
+	border-radius: 0 0 0 8px;
+}
+#Next {
+	width: 266px;
+	-webkit-border-radius: 0 0 8px 0;
+	border-radius: 0 0 8px 0;
+}
+.nextprev:hover {
+	background: #29331F;
+}
+#place-div {
+	font-family: Roboto;
+	font-size: 15px;
+	font-weight: 300;
+	padding: 0 11px 0 13px;
+	text-overflow: ellipsis;
+	border: 1px solid transparent;
+	border-radius: 2px 0 0 2px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+	height:32px;
+	margin-top:16px;
+	width: 300px;
+}
