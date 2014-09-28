@@ -157,11 +157,11 @@ function languageSel() {
 			document.title = tabName[jQuery(this).attr('id')];
 			if(jQuery('#selectObstacles').length != 0)
 				jQuery('#selectObstacles').html(jQuery('#selectObstacles').html().replace(new RegExp(window.obsName[window.lang], 'g'), window.obsName[jQuery(this).attr('id')]));
+			jQuery('#' + window.options[currentOption]).tooltip('close').tooltip('open');
 			for(i = 0; i < window.options.length; ++i) {
 				jQuery('#' + window.options[i]).text(window.optionNames[jQuery(this).attr('id')][i]);
 			}
 			window.lang = jQuery(this).attr('id');
-			jQuery('#' + window.options[currentOption]).tooltip('close').tooltip('open');
 		}
 	});
 }

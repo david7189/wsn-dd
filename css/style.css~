@@ -50,7 +50,7 @@ body {
 	-webkit-border-radius: 8px 8px 8px 8px;
 	border-radius: 8px 8px 8px 8px;
 }
-#divTitle {
+#divTitulo {
 	margin-left: 25px;
 	height:60px;
 	width: 600px;
