@@ -4,7 +4,8 @@ function initialize() {
 	jQuery('#language').css({'right': distanceRight, 'display': 'block'});
 	jQuery('#place-div').val('');
 	var options = {
-		center: new google.maps.LatLng(4.606487, -74.067147),
+		//center: new google.maps.LatLng(4.606487, -74.067147),
+		center: new google.maps.LatLng(48.85837, 2.294481),
 		zoom: 19,
 		disableDefaultUI: true,
 		mapTypeId: google.maps.MapTypeId.SATELLITE, //TERRAIN or SATELLITE seem fine to me...
@@ -29,7 +30,7 @@ function initialize() {
 			position: google.maps.ControlPosition.TOP_LEFT
 		},
 		zoomControl: true,
-        zoomControlOptions: {
+		zoomControlOptions: {
           style: google.maps.ZoomControlStyle.LARGE,
 		  position: google.maps.ControlPosition.TOP_LEFT
         },
@@ -155,8 +156,12 @@ function languageSel() {
 			jQuery(this).css({'text-transform': 'uppercase', 'text-decoration': 'underline', 'cursor': 'default'});
 			jQuery('#title').text(title[jQuery(this).attr('id')]);
 			document.title = tabName[jQuery(this).attr('id')];
-			if(jQuery('#selectObstacles').length != 0)
+			if(jQuery('#selectObstacles').length != 0) {
 				jQuery('#selectObstacles').html(jQuery('#selectObstacles').html().replace(new RegExp(window.obsName[window.lang], 'g'), window.obsName[jQuery(this).attr('id')]));
+				jQuery('#createObstacle').text(window.newObs[jQuery(this).attr('id')]);			
+			}
+			jQuery('#clear-all').text(window.clearText[jQuery(this).attr('id')]);
+			jQuery('.menu-mark').html(menuText[jQuery(this).attr('id')]);
 			for(i = 0; i < window.options.length; ++i) {
 				jQuery('#' + window.options[i]).text(window.optionNames[jQuery(this).attr('id')][i]);
 			}
@@ -270,6 +275,9 @@ function initializeVariables() {
 	window.polygons = [];
 	window.options = ['Area', 'Nodes', 'Obstacles'];
 	window.obsName = {'eng': 'Obstacle ', 'esp': 'Obstáculo '};
+	window.menuText = {'eng': 'Delete Node', 'esp': 'Borrar Nodo'};
+	window.newObs = {'eng': 'New Obstacle', 'esp': 'Nuevo Obstáculo'};
+	window.clearText = {'eng': 'Clear All', 'esp': 'Borrar Todo'};
 	window.optionNames = {'eng': ['Select Area', 'Place Nodes', 'Define Obstacles'], 'esp': ['Elegir Área', 'Ubicar Nodos', 'Definir Obstáculos']};
 	window.optionDescriptions = {'eng': ['This is the first stage of the <span style="font-weight:bold;">"Wireless Sensor Network Deployment Design"</span> tool.<br /><br /> \
 		Choose the Area you want to work in and once you\'re comfortable, click on <span style="font-weight:bold;">Next</span>.<br /><br />To open back this \
@@ -291,9 +299,9 @@ function initializeVariables() {
 function createBlocks() {
 	for(var i = 0; i < window.blockMarkers.length; i++) {
 		if(window.blockMarkers[i].length != 0 && jQuery('#selectObstacles option[value="' + (i+1) + '"]').length == 0) {
-			jQuery('#selectObstacles').append('<option value="' + (i+1) + '">Obstacle ' + (i+2) + '</option>');
-			window.blockMarkers.push([]);
-		} else if(window.blockMarkers[i].length == 0 && i < (window.blockMarkers.length-1)) {
+			jQuery('#createObstacle').prop('disabled', false);
+			jQuery('#createObstacle').css({'cursor': 'pointer', 'background-color': '#f8f8f8', 'color': '#181818'});
+		} else if(window.blockMarkers[i].length == 0) {
 			for(var j = (i+1); j < window.blockMarkers.length; j++) {
 				window.blockMarkers[j-1] = window.blockMarkers[j];
 				for(var k = 0; k < window.blockMarkers[j-1].length; k++) {
@@ -302,8 +310,16 @@ function createBlocks() {
 					window.blockMarkers[j-1][k].id = ((val1-1) + ',' + val2);
 				}
 			}
-			window.blockMarkers.splice(window.blockMarkers.length-1, 1);
-			jQuery('#selectObstacles option:last').remove();
+			if (jQuery('#selectObstacles option:last').prop('value') != '0') {
+				window.blockMarkers.splice(window.blockMarkers.length-1, 1);
+				if(jQuery('#selectObstacles option:last').prop('selected') == true)
+					jQuery('#selectObstacles option[value="' + (jQuery('#selectObstacles option:last').prop('value') - 1) + '"]').prop('selected', true);
+				jQuery('#selectObstacles option:last').remove();
+			} else {
+				jQuery('#createObstacle').prop('disabled', true);
+				jQuery('#createObstacle').css({'cursor': 'default', 'background-color': '#dfdfdf', 'color': '#c6c6c6'});
+			}
+			selectedBlock();
 		}
 	}
 	var coords = [];
@@ -332,19 +348,6 @@ function createBlocks() {
 		createLines();
 		polygon.setMap(map);
 	}
-	selectedBlock();
-	var borrar = [];
-	for(var j = 0; j < window.polygons.length; j++) {
-		for(var i = 0; i < window.markers.length; i++) {
-			if(window.polygons[j].containsLatLng(new google.maps.LatLng(window.markers[i].getPosition().lat(), window.markers[i].getPosition().lng()))) {
-				borrar.push(window.markers[i].id - borrar.length);
-			}
-		}
-	}
-	for(var k = 0; k < borrar.length; k++) {
-		deleteMarker(borrar[k]);
-	}
-	
 }
 
 function selectedBlock() {
@@ -360,24 +363,12 @@ function selectedBlock() {
 }
 
 function obsSelector(div) {
-	
 	var selectList = document.createElement('select');
 	selectList.id = 'selectObstacles';
 	div.appendChild(selectList);
 	jQuery(div).css('padding', '5px');
-	jQuery(selectList).css('width', '85px');
-	jQuery(selectList).css('padding', '0px');
-	jQuery(selectList).css('font-size', '11px');
-	jQuery(selectList).css('height', '20px');
-	jQuery(selectList).css('font-weight', '500');
-	jQuery(selectList).css('font-family', 'Roboto,Arial,sans-serif');
-	jQuery(selectList).css('background-clip', 'padding-box');
-	jQuery(selectList).css('cursor', 'pointer');
-	jQuery(selectList).css('text-align', 'left');
-	jQuery(selectList).css('color', '#181818');
-	jQuery(selectList).css('background-color', '#f8f8f8');
-	jQuery(selectList).css('border', '0');
-	jQuery(selectList).css('display', 'inline-block');
+	jQuery(selectList).css({'width': '100px', 'padding': '0px', 'font-size': '11px', 'height': '20px', 'font-weight': '500', 'font-family': 'Roboto,Arial,sans-serif'});
+	jQuery(selectList).css({'background-clip': 'padding-box', 'cursor': 'pointer', 'text-align': 'left', 'color': '#181818', 'background-color': '#f8f8f8', 'border': '0', 'display': 'inline-block'});
 	for(var i = 0; i <= window.polygons.length; i++) {
 		var option = document.createElement('option');
 		option.value = i;
@@ -386,6 +377,63 @@ function obsSelector(div) {
 	}
 	jQuery(selectList).on('change', function() {
 		selectedBlock();
+	});
+}
+
+function createObstacle(div) {
+	var createObs = document.createElement('button');
+	createObs.id = 'createObstacle';
+	jQuery(createObs).text(window.newObs[window.lang]);
+	jQuery(createObs).attr('disabled', 'disabled');
+	div.appendChild(createObs);
+	jQuery(div).css('padding', '5px');
+	jQuery(createObs).css({'width': '100px', 'padding': '0px', 'font-size': '11px', 'height': '20px', 'font-weight': '500', 'font-family': 'Roboto,Arial,sans-serif'});
+	jQuery(createObs).css({'background-clip': 'padding-box', 'cursor': 'default', 'color': '#c6c6c6', 'background-color': '#dfdfdf', 'display': 'inline-block'});
+	jQuery(createObs).on('click', function() {
+		jQuery('#selectObstacles').append('<option value="' + parseInt(parseInt(jQuery('#selectObstacles option:last').attr('value')) + 1) + '">' + window.obsName[window.lang] + parseInt(parseInt(jQuery('#selectObstacles option:last').attr('value')) + 2) + '</option>');
+		window.blockMarkers.push([]);
+		jQuery('#selectObstacles option:last').prop('selected', true);
+		selectedBlock();
+		jQuery('#createObstacle').prop('disabled', true);
+		jQuery('#createObstacle').css({'cursor': 'default', 'background-color': '#dfdfdf', 'color': '#c6c6c6'});
+	});
+}
+
+function callMenu(marker) {
+	var boxText = document.createElement('div');
+    jQuery(boxText).addClass('menu-mark-container');
+	var delMark = document.createElement('div');
+	jQuery(delMark).addClass('menu-mark');
+	jQuery(delMark).hover(function() {
+			jQuery(this).css({'color': '#3f3f3f', 'background-color': '#dadada', 'border': '1px solid #3f3f3f', 'padding': '1px'});
+		},
+		function() {
+			jQuery(this).css({'color': '#3c3c3c', 'background-color': '#c6c6c6', 'border': '0', 'padding': '2px'});
+		});
+	jQuery(delMark).html(window.menuText[window.lang]);
+	boxText.appendChild(delMark);
+	var options = {
+		content: boxText,
+		disableAutoPan: false,
+		maxWidth: 0,
+		pixelOffset: new google.maps.Size(15, -42),
+		zIndex: null,
+		boxStyle: {
+			opacity: 0.9,
+			width: '140px'
+		},
+		closeBoxMargin: '12px 4px 4px 4px',
+		closeBoxURL: 'http://www.google.com/intl/en_us/mapfiles/close.gif',
+		infoBoxClearance: new google.maps.Size(1, 1),
+		isHidden: false,
+		pane: 'floatPane',
+		enableEventPropagation: false
+	};
+	var ib = new InfoBox(options);
+	ib.open(map, marker);
+	jQuery(boxText).click(function() {
+		ib.close();
+		deleteMarker(marker.id);
 	});
 }
 
@@ -403,7 +451,8 @@ function buttons(opt) {
 			scrolwheel: true,
 			draggableCursor: 'move'
 		});
-		map.controls[google.maps.ControlPosition.RIGHT].clear();
+		jQuery('#selectObstacles').hide();
+		jQuery('#createObstacle').hide();		
 		jQuery('#place-div').css('display', 'block');
 		jQuery('#clear-all').css('display', 'block');
 		google.maps.event.removeListener(window.lis);
@@ -412,6 +461,7 @@ function buttons(opt) {
 		google.maps.event.removeListener(window.lis);
 		staticOptions();
 		jQuery('#selectObstacles').hide();
+		jQuery('#createObstacle').hide();
 		selectedBlock();
 		window.lis = google.maps.event.addListener(map, 'click', function(event) {
 			var createMark = true;
@@ -428,7 +478,8 @@ function buttons(opt) {
 					icon: 'http://gmaps-samples.googlecode.com/svn/trunk/markers/red/marker' + window.counter + '.png'
 				});
 				google.maps.event.addListener(marker, 'rightclick', function() {
-					deleteMarker(marker.id);
+					callMenu(marker);
+					//deleteMarker(marker.id);
 				});
 				window.markers.push(marker);	
 				var circleOptions = {
@@ -458,8 +509,12 @@ function buttons(opt) {
 			var obstacleSelectorDiv = document.createElement('div');
 			var obstacleSelector = new obsSelector(obstacleSelectorDiv);
 			map.controls[google.maps.ControlPosition.RIGHT].push(obstacleSelectorDiv);
+			var createObstacleDiv = document.createElement('div');
+			var createObs = new createObstacle(createObstacleDiv);
+			map.controls[google.maps.ControlPosition.RIGHT].push(createObstacleDiv);
 		} else {
 			jQuery('#selectObstacles').show();
+			jQuery('#createObstacle').show();
 		}
 		selectedBlock();
 		window.lis = google.maps.event.addListener(map, 'click', function(event) {
