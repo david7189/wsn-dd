@@ -2,6 +2,19 @@ function initialize() {
 	var distanceRight = (screen.width - jQuery('#container').css('width').substring(0, jQuery('#container').css('width').length - 2))/2;
 	distanceRight = (distanceRight - jQuery('#language').css('width').substring(0, jQuery('#language').css('width').length - 2))/2 - 10;
 	jQuery('#language').css({'right': distanceRight, 'display': 'block'});
+	jQuery('#menu').css({'right': distanceRight, 'display': 'block'});
+	saveState();
+	loadState();
+	jQuery('.stateButton').mousedown(function() {
+		jQuery(this).css({'background-color': '#e4e4e4'});
+	});
+	jQuery('.stateButton').mouseup(function() {
+		jQuery(this).css({'background-color': '#d7d7d7'});
+	});
+	jQuery('.stateButton').mouseout(function() {
+		jQuery(this).css({'background-color': '#d7d7d7'});
+	});
+	nextPrev();
 	jQuery('#place-div').val('');
 	var options = {
 		//center: new google.maps.LatLng(4.606487, -74.067147),
@@ -51,12 +64,12 @@ function initialize() {
 	jQuery(clearAll).css({'margin-bottom': '16px', 'height': '30px', 'line-height': '30px', 'border-radius': '8px', 'box-shadow': 'inset 1px 1px 8px #a8a8a8', 'color': '#3f3f3f'});	
 	jQuery(clearAll).css({'-webkit-touch-callout': 'none', '-webkit-user-select': 'none', '-khtml-user-select': 'none', '-moz-user-select': 'none', '-ms-user-select': 'none', 'user-select': 'none'});	
 	jQuery(clearAll).hover(function() {
-		jQuery(this).css({'box-shadow': 'inset -1px -1px 8px #a8a8a8'});
+		jQuery(this).css({'box-shadow': 'inset -1px -1px 8px #a8a8a8', 'background-color': '#dcdcdc'});
 	}, function() {
-		jQuery(this).css({'box-shadow': 'inset 1px 1px 8px #a8a8a8'});
+		jQuery(this).css({'box-shadow': 'inset 1px 1px 8px #a8a8a8', 'background-color': '#d7d7d7'});
 	});
 	jQuery(clearAll).mousedown(function() {
-		jQuery(this).css({'background-color': '#ffffff'});
+		jQuery(this).css({'background-color': '#e4e4e4'});
 	});
 	jQuery(clearAll).mouseup(function() {
 		jQuery(this).css({'background-color': '#d7d7d7'});
@@ -96,9 +109,7 @@ function initialize() {
    }).tooltip({
 		content: function() {
 			return optionDescriptions[window.lang][currentOption] + '<span style="font-weight: bold;">' + window.optionNames[window.lang][currentOption] + '</span><br /><br />' +
-			'<span style="position:absolute;top:0;right:0;cursor:pointer;" class="tooltipClose ui-icon ui-icon-closethick"></span>' +
-			'<span style="position:absolute;bottom:0;left:0;cursor:pointer;font-weight:bold;" class="nextprev Previous">< Previous</span>' +
-			'<span style="position:absolute;bottom:0;right:0;cursor:pointer;font-weight:bold;" class="nextprev Next">Next ></span>';
+			'<span style="position:absolute;top:0;right:0;cursor:pointer;" class="tooltipClose ui-icon ui-icon-closethick"></span>';
 		},
 		position: {
 			my: 'bottom',
@@ -111,7 +122,6 @@ function initialize() {
 			jQuery('.tooltipClose').click(function() {
 				jQuery('#' + window.options[currentOption]).tooltip('close');
 			});
-			nextPrev();
 		}			
 	}).on('click', function() {
 		if(jQuery(this).attr('id') == window.options[currentOption])
@@ -146,6 +156,110 @@ function initialize() {
   	languageSel();
 }
 
+function saveState() {
+	jQuery('#saveState').click(function() {
+		for(var key in localStorage) {
+			localStorage.removeItem(key);
+		}
+		var markersLat = [];
+		var markersLng = [];
+		var blockMarkersLat = [];
+		var blockMarkersLng = [];
+		for(var i = 0; i < window.markers.length; ++i) {
+			markersLat.push([window.markers[i].position.lat()]);
+			markersLng.push([window.markers[i].position.lng()]);
+		}
+		for(var i = 0; i < window.blockMarkers.length; i++) {
+			blockMarkersLat.push([]);
+			blockMarkersLng.push([]);
+			for(var j = 0; j < window.blockMarkers[i].length; j++) {
+				blockMarkersLat[i].push(window.blockMarkers[i][j].position.lat());
+				blockMarkersLng[i].push(window.blockMarkers[i][j].position.lng());
+			}
+		}
+		localStorage.setItem('zoom', map.getZoom());
+		localStorage.setItem('center', JSON.stringify([map.getCenter().lat(), map.getCenter().lng()]));
+		localStorage.setItem('markersLat', JSON.stringify(markersLat));
+		localStorage.setItem('markersLng', JSON.stringify(markersLng));
+		localStorage.setItem('blockMarkersLat', JSON.stringify(blockMarkersLat));
+		localStorage.setItem('blockMarkersLng', JSON.stringify(blockMarkersLng));
+		jQuery('#state-text').text(window.confirmStates[window.lang][0]);
+		window.dialog.dialog('open');
+	});
+}
+
+function loadState() {
+	jQuery('#loadState').click(function() {
+		if(localStorage.length == 0) {
+			jQuery('#state-text').text(window.confirmStates[window.lang][2]);
+			window.dialog.dialog('open');
+		} else {
+			for(var i = 0; i < window.markers.length; ++i) {
+				window.markers[i].setMap(null);
+				window.circles[i].setMap(null);
+			}
+			for(var i = 0; i < window.blockMarkers.length; i++) {
+				for(var j = 0; j < window.blockMarkers[i].length; j++) {
+					window.blockMarkers[i][j].setMap(null);
+				}
+			}
+			for(var i = 0; i < window.polygons.length; i++) {
+				window.polygons[i].setMap(null);
+			}
+			window.polygons = [];
+			window.blockMarkers = [[]];
+			window.markers = [];
+			window.circles = [];
+			window.counter = 1;
+			jQuery('#selectObstacles').html('<option value="0">' + window.obsName[window.lang] + (1) + '</option>');
+			if(localStorage.getItem('zoom') != null) map.setZoom(parseInt(localStorage.getItem('zoom')));
+			if(JSON.parse(localStorage.getItem('center')) != null) {
+				var center = JSON.parse(localStorage.getItem('center'));
+				map.setCenter(new google.maps.LatLng(center[0], center[1]));
+			}
+			if(JSON.parse(localStorage.getItem('markersLat')) != null) {
+				var markersLat = JSON.parse(localStorage.getItem('markersLat'));
+				var markersLng = JSON.parse(localStorage.getItem('markersLng'));
+				for(var i = 0; i < markersLat.length; i++) {
+					createMarker(new google.maps.LatLng(markersLat[i], markersLng[i]), false);
+				}
+				createLines();
+			}
+			if(JSON.parse(localStorage.getItem('blockMarkersLat')) != null) {
+				var blockMarkersLat = JSON.parse(localStorage.getItem('blockMarkersLat'));
+				var blockMarkersLng = JSON.parse(localStorage.getItem('blockMarkersLng'));
+				if(jQuery('#selectObstacles').length == 0) {
+					var obstacleSelectorDiv = document.createElement('div');
+					var obstacleSelector = new obsSelector(obstacleSelectorDiv);
+					map.controls[google.maps.ControlPosition.RIGHT].push(obstacleSelectorDiv);
+					var createObstacleDiv = document.createElement('div');
+					var createObs = new createObstacle(createObstacleDiv);
+					map.controls[google.maps.ControlPosition.RIGHT].push(createObstacleDiv);
+					jQuery('#selectObstacles').hide();
+					jQuery('#createObstacle').hide();
+				}
+				for(var i = 0; i < blockMarkersLat.length; ++i) {
+					for(var j = 0; j < blockMarkersLat[i].length; ++j) {
+						createBlockMarker(new google.maps.LatLng(blockMarkersLat[i][j], blockMarkersLng[i][j]), i, true);	
+					}
+					if(i > i < blockMarkersLat.length-1) {
+						jQuery('#selectObstacles').append('<option value="' + parseInt(parseInt(jQuery('#selectObstacles option:last').attr('value')) + 1) + '">' + window.obsName[window.lang] + parseInt(parseInt(jQuery('#selectObstacles option:last').attr('value')) + 2) + '</option>');
+						window.blockMarkers.push([]);
+					}
+				}
+				createBlocks();
+				if(window.blockMarkers[jQuery('#selectObstacles option:last').val()].length == 0) {
+					jQuery('#createObstacle').prop('disabled', true);
+					jQuery('#createObstacle').css({'cursor': 'default', 'background-color': '#dfdfdf', 'color': '#c6c6c6'});
+				}
+				jQuery('#selectObstacles option:last').prop('selected', true);
+			}
+			jQuery('#state-text').text(window.confirmStates[window.lang][1]);
+			window.dialog.dialog('open');
+		}
+	});
+}
+
 function languageSel() {
 	var title = {'eng': 'Wireless Sensor Network Deployment Design', 'esp': 'Diseño de Despliegue de Redes Inalámbricas de Sensores'};
 	var tabName = {'eng': 'Wireless Sensor Network Deployment Design', 'esp': 'Diseño de Despliegue de Redes Inalámbricas de Sensores'};
@@ -156,6 +270,10 @@ function languageSel() {
 			jQuery(this).css({'text-transform': 'uppercase', 'text-decoration': 'underline', 'cursor': 'default'});
 			jQuery('#title').text(title[jQuery(this).attr('id')]);
 			document.title = tabName[jQuery(this).attr('id')];
+			jQuery('.nextprev:first').text(window.arrows[jQuery(this).attr('id')][0]);
+			jQuery('.nextprev:last').text(window.arrows[jQuery(this).attr('id')][1]);
+			jQuery('#saveState').text(window.states[jQuery(this).attr('id')][0]);
+			jQuery('#loadState').text(window.states[jQuery(this).attr('id')][1]);
 			if(jQuery('#selectObstacles').length != 0) {
 				jQuery('#selectObstacles').html(jQuery('#selectObstacles').html().replace(new RegExp(window.obsName[window.lang], 'g'), window.obsName[jQuery(this).attr('id')]));
 				jQuery('#createObstacle').text(window.newObs[jQuery(this).attr('id')]);			
@@ -273,11 +391,14 @@ function initializeVariables() {
 	window.counter = 1;
 	window.lang = 'eng';
 	window.polygons = [];
+	window.arrows = {'eng': ['< Previous', 'Next >'], 'esp': ['< Anterior', 'Siguiente >']};
+	window.states = {'eng': ['Save State', 'Load State'], 'esp': ['Guardar Estado', 'Cargar Estado']};
 	window.options = ['Area', 'Nodes', 'Obstacles'];
 	window.obsName = {'eng': 'Obstacle ', 'esp': 'Obstáculo '};
 	window.menuText = {'eng': 'Delete Node', 'esp': 'Borrar Nodo'};
 	window.newObs = {'eng': 'New Obstacle', 'esp': 'Nuevo Obstáculo'};
 	window.clearText = {'eng': 'Clear All', 'esp': 'Borrar Todo'};
+	window.confirmStates = {'eng': ['State Saved', 'State Loaded', 'No Previous Data'], 'esp': ['Estado Guardado', 'Estado Cargado', 'No Hay Datos Previos']};
 	window.optionNames = {'eng': ['Select Area', 'Place Nodes', 'Define Obstacles'], 'esp': ['Elegir Área', 'Ubicar Nodos', 'Definir Obstáculos']};
 	window.optionDescriptions = {'eng': ['This is the first stage of the <span style="font-weight:bold;">"Wireless Sensor Network Deployment Design"</span> tool.<br /><br /> \
 		Choose the Area you want to work in and once you\'re comfortable, click on <span style="font-weight:bold;">Next</span>.<br /><br />To open back this \
@@ -294,6 +415,15 @@ function initializeVariables() {
 		'Este paso le permite definir los obstáculos en el área. Puede definir tantos como quiera a través de la opción "selector de obstáculos" en el borde superior \
 		derecho del mapa.<br /><br />Para volver a abrir esta Ayuda en caso de que la cierre, haga click en ']};
 	window.currentOption = 0;
+	window.dialog = jQuery('#confirm-state').dialog({
+		autoOpen: false,
+		height: 60,
+		width: 200,
+		modal: true
+	});
+	jQuery('.state-close').click(function() {
+		window.dialog.dialog('close');
+	});
 }
 
 function createBlocks() {
@@ -437,6 +567,58 @@ function callMenu(marker) {
 	});
 }
 
+function createMarker(e, lines) {
+	var marker = new google.maps.Marker({
+		position: e,
+		map: map,
+		id: window.counter,
+		icon: 'http://gmaps-samples.googlecode.com/svn/trunk/markers/red/marker' + window.counter + '.png'
+	});
+	google.maps.event.addListener(marker, 'rightclick', function() {
+		callMenu(marker);
+	});
+	window.markers.push(marker);	
+	var circleOptions = {
+		strokeColor: '#ADFF2F',
+		strokeOpacity: 0.5,
+		strokeWeight: 2,
+		fillColor: '#ADFF2F',
+		fillOpacity: 0.25,
+		map: map,
+		center: e,
+		radius: 50,
+		clickable: false,
+		id: window.counter,
+		zIndex: 1
+	};
+	var circle = new google.maps.Circle(circleOptions);
+	window.circles.push(circle);
+	window.counter++;
+	if(lines) {
+		createLines();
+	}
+}
+
+function createBlockMarker(e, valor, blocks) {
+	var blockMarker = new google.maps.Marker({
+		position: e,
+		map: map,
+		id: (valor + ',' + (window.blockMarkers[valor].length)),
+		draggable: true,
+		icon: 'http://gmaps-samples.googlecode.com/svn/trunk/markers/blue/marker' + (window.blockMarkers[valor].length + 1) +'.png'
+	});
+	google.maps.event.addListener(blockMarker, 'rightclick', function() {
+		deleteBlockMarker(blockMarker.id);
+	});
+	google.maps.event.addListener(blockMarker, 'dragend', function() {
+		createBlocks();
+	});
+	window.blockMarkers[valor].push(blockMarker);
+	if(blocks) {
+		createBlocks();
+	}
+}
+
 function buttons(opt) {
 	if(opt == 'Area') {
 		window.map.setOptions({
@@ -471,34 +653,7 @@ function buttons(opt) {
 				}	
 			}
 			if(createMark) {
-				var marker = new google.maps.Marker({
-					position: event.latLng,
-					map: map,
-					id: window.counter,
-					icon: 'http://gmaps-samples.googlecode.com/svn/trunk/markers/red/marker' + window.counter + '.png'
-				});
-				google.maps.event.addListener(marker, 'rightclick', function() {
-					callMenu(marker);
-					//deleteMarker(marker.id);
-				});
-				window.markers.push(marker);	
-				var circleOptions = {
-					strokeColor: '#ADFF2F',
-					strokeOpacity: 0.5,
-					strokeWeight: 2,
-					fillColor: '#ADFF2F',
-					fillOpacity: 0.25,
-					map: map,
-					center: event.latLng,
-					radius: 50,
-					clickable: false,
-					id: window.counter,
-					zIndex: 1
-				};
-				var circle = new google.maps.Circle(circleOptions);
-				window.circles.push(circle);
-				window.counter++;
-				createLines();
+				createMarker(event.latLng, true);
 			}
 		});
 	}
@@ -518,21 +673,7 @@ function buttons(opt) {
 		}
 		selectedBlock();
 		window.lis = google.maps.event.addListener(map, 'click', function(event) {
-			var blockMarker = new google.maps.Marker({
-				position: event.latLng,
-				map: map,
-				id: (jQuery('#selectObstacles option:selected').val() + ',' + (window.blockMarkers[jQuery('#selectObstacles option:selected').val()].length)),
-				draggable: true,
-				icon: 'http://gmaps-samples.googlecode.com/svn/trunk/markers/blue/marker' + (window.blockMarkers[jQuery('#selectObstacles option:selected').val()].length + 1) +'.png'
-			});
-			google.maps.event.addListener(blockMarker, 'rightclick', function() {
-				deleteBlockMarker(blockMarker.id);
-			});
-			google.maps.event.addListener(blockMarker, 'dragend', function() {
-				createBlocks();
-			});
-			window.blockMarkers[jQuery('#selectObstacles option:selected').val()].push(blockMarker);
-			createBlocks();
+			createBlockMarker(event.latLng, jQuery('#selectObstacles option:selected').val(), true);
 		});
 	}
 }
@@ -545,14 +686,18 @@ function nextPrev() {
 			currentOption += 1;
 			buttons(options[currentOption]);
 			jQuery('#' + options[currentOption]).css('background', '#29331F');
-			jQuery('#' + options[currentOption]).tooltip('open');
+			if(jQuery('.ui-tooltip').length != 0) {
+				jQuery('#' + options[currentOption]).tooltip('open');
+			}
 		} else if(jQuery(this).attr('class').indexOf('Previous') > -1 && currentOption > 0) {
 			jQuery('#' + options[currentOption]).tooltip('close');
 			jQuery('#' + options[currentOption]).css('background', '#7A995C');
 			currentOption -= 1;
 			buttons(options[currentOption]);
 			jQuery('#' + options[currentOption]).css('background', '#29331F');
-			jQuery('#' + options[currentOption]).tooltip('open');
+			if(jQuery('.ui-tooltip').length != 0) {
+				jQuery('#' + options[currentOption]).tooltip('open');
+			}
 		}
 	});
 }
