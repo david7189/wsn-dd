@@ -165,11 +165,15 @@ function saveState() {
 		var markersLng = [];
 		var blockMarkersLat = [];
 		var blockMarkersLng = [];
+		var circlesRad = []
 		for(var i = 0; i < window.markers.length; ++i) {
 			markersLat.push([window.markers[i].position.lat()]);
 			markersLng.push([window.markers[i].position.lng()]);
 		}
-		for(var i = 0; i < window.blockMarkers.length; i++) {
+		for(var i = 0; i < window.circles.length; ++i) {
+			circlesRad.push(window.circles[i].getRadius());
+		}
+		for(var i = 0; i < window.blockMarkers.length; ++i) {
 			blockMarkersLat.push([]);
 			blockMarkersLng.push([]);
 			for(var j = 0; j < window.blockMarkers[i].length; j++) {
@@ -179,6 +183,7 @@ function saveState() {
 		}
 		localStorage.setItem('zoom', map.getZoom());
 		localStorage.setItem('center', JSON.stringify([map.getCenter().lat(), map.getCenter().lng()]));
+		localStorage.setItem('circles', JSON.stringify(circlesRad));
 		localStorage.setItem('markersLat', JSON.stringify(markersLat));
 		localStorage.setItem('markersLng', JSON.stringify(markersLng));
 		localStorage.setItem('blockMarkersLat', JSON.stringify(blockMarkersLat));
@@ -218,10 +223,11 @@ function loadState() {
 				map.setCenter(new google.maps.LatLng(center[0], center[1]));
 			}
 			if(JSON.parse(localStorage.getItem('markersLat')) != null) {
+				var circlesRad = JSON.parse(localStorage.getItem('circles'));
 				var markersLat = JSON.parse(localStorage.getItem('markersLat'));
 				var markersLng = JSON.parse(localStorage.getItem('markersLng'));
 				for(var i = 0; i < markersLat.length; i++) {
-					createMarker(new google.maps.LatLng(markersLat[i], markersLng[i]), false);
+					createMarker(new google.maps.LatLng(markersLat[i], markersLng[i]), false, circlesRad[i]);
 				}
 				createLines();
 			}
@@ -253,6 +259,7 @@ function loadState() {
 					jQuery('#createObstacle').css({'cursor': 'default', 'background-color': '#dfdfdf', 'color': '#c6c6c6'});
 				}
 				jQuery('#selectObstacles option:last').prop('selected', true);
+				selectedBlock();
 			}
 			jQuery('#state-text').text(window.confirmStates[window.lang][1]);
 			window.dialog.dialog('open');
@@ -284,14 +291,15 @@ function languageSel() {
 				jQuery('#' + window.options[i]).text(window.optionNames[jQuery(this).attr('id')][i]);
 			}
 			window.lang = jQuery(this).attr('id');
-			jQuery('#' + window.options[currentOption]).tooltip('close').tooltip('open');
+			if(jQuery('.ui-tooltip').length > 0)
+				jQuery('#' + window.options[currentOption]).tooltip('close').tooltip('open');
 		}
 	});
 }
 
-function computeDistance(a, b) {
+function computeDistance(a, b, i, j) {
 	var distance = google.maps.geometry.spherical.computeDistanceBetween(a, b);
-	if(distance <= 50.0 && !crossesPolygon(a, b, a)) {
+	if(distance <= Math.min(window.circles[i].getRadius(), window.circles[j].getRadius()) && !crossesPolygon(a, b, a)) {
 		return true;
 	}
 	return false;
@@ -321,7 +329,7 @@ function createLines() {
 	for(i = 0; i < window.markers.length - 1; i++) {
 		for(j = i + 1; j < window.markers.length; j++) {
 			var distance = computeDistance(new google.maps.LatLng(window.markers[i].getPosition().lat(), window.markers[i].getPosition().lng()),
-				new google.maps.LatLng(window.markers[j].getPosition().lat(), window.markers[j].getPosition().lng()));
+				new google.maps.LatLng(window.markers[j].getPosition().lat(), window.markers[j].getPosition().lng()), i, j);
 			if(distance) {
 				var coordinates = [new google.maps.LatLng(window.markers[i].getPosition().lat(), window.markers[i].getPosition().lng()),
 					new google.maps.LatLng(window.markers[j].getPosition().lat(), window.markers[j].getPosition().lng())];
@@ -533,15 +541,21 @@ function callMenu(marker) {
 	var boxText = document.createElement('div');
     jQuery(boxText).addClass('menu-mark-container');
 	var delMark = document.createElement('div');
-	jQuery(delMark).addClass('menu-mark');
-	jQuery(delMark).hover(function() {
+	var typeSel = document.createElement('div');
+	jQuery(delMark).add(typeSel).addClass('menu-mark');
+	jQuery(delMark).add(typeSel).hover(function() {
 			jQuery(this).css({'color': '#3f3f3f', 'background-color': '#dadada', 'border': '1px solid #3f3f3f', 'padding': '1px'});
 		},
 		function() {
 			jQuery(this).css({'color': '#3c3c3c', 'background-color': '#c6c6c6', 'border': '0', 'padding': '2px'});
 		});
 	jQuery(delMark).html(window.menuText[window.lang]);
+	var id = marker.id - 1;
+	jQuery(typeSel).html('<input type="radio" name="rad' + id + '" value="10" checked />10<br /><input type="radio" name="rad' + id + '" value="20" />20<br />\
+		<input type="radio" name="rad' + id + '" value="30" />30<br /><input type="radio" name="rad' + id + '" value="40" />40<br />\
+		<input type="radio" name="rad' + id + '" value="50" />50');
 	boxText.appendChild(delMark);
+	boxText.appendChild(typeSel);
 	var options = {
 		content: boxText,
 		disableAutoPan: false,
@@ -561,13 +575,18 @@ function callMenu(marker) {
 	};
 	var ib = new InfoBox(options);
 	ib.open(map, marker);
-	jQuery(boxText).click(function() {
+	jQuery(delMark).click(function() {
 		ib.close();
 		deleteMarker(marker.id);
 	});
+	jQuery(typeSel).change(function() {
+		window.circles[marker.id-1].setRadius(parseInt(jQuery('input:radio[name=rad' + id + ']:checked').val()));
+		createLines();
+	});
 }
 
-function createMarker(e, lines) {
+function createMarker(e, lines, r) {
+	if(typeof(r) === 'undefined') r = 10;
 	var marker = new google.maps.Marker({
 		position: e,
 		map: map,
@@ -577,7 +596,7 @@ function createMarker(e, lines) {
 	google.maps.event.addListener(marker, 'rightclick', function() {
 		callMenu(marker);
 	});
-	window.markers.push(marker);	
+	window.markers.push(marker);
 	var circleOptions = {
 		strokeColor: '#ADFF2F',
 		strokeOpacity: 0.5,
@@ -586,7 +605,7 @@ function createMarker(e, lines) {
 		fillOpacity: 0.25,
 		map: map,
 		center: e,
-		radius: 50,
+		radius: r,
 		clickable: false,
 		id: window.counter,
 		zIndex: 1
