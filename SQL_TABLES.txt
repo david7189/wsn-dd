@@ -1,0 +1,82 @@
+CREATE TABLE google_users (
+	id varchar(30) not null,
+	name varchar(100) not null,
+	email varchar(100) not null,
+	picture_url varchar(200),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE hw_platforms (
+	id mediumint not null auto_increment,
+	name varchar(30) not null,
+	range_ double not null,
+	rate double,
+	voltage double,
+	frequency double,
+	ram double,
+	flash double,
+	energy double,
+	rx double,
+	cost double not null,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE deployments (
+	id mediumint not null auto_increment,
+	name CHAR(50) not null,
+	defnode mediumint not null,
+	budget float not null,
+	budremain float not null,
+	budtype char(10) not null,
+	step int not null,
+	zoom int,
+	centerlat varchar(20),
+	centerlng varchar(20),
+	type varchar(20),
+	PRIMARY KEY (id),
+	FOREIGN KEY(defnode) REFERENCES hw_platforms(id)
+);
+
+CREATE TABLE users_deployments (
+	id mediumint not null auto_increment,
+	id_users char(50) not null,
+        id_deployments mediumint not null,
+	PRIMARY KEY (id),
+	FOREIGN KEY (id_users) REFERENCES google_users(id),
+	FOREIGN KEY (id_deployments) REFERENCES deployments(id)
+);
+
+CREATE TABLE nodes (
+	id mediumint not null auto_increment,
+	deployment mediumint not null,
+	lat varchar(20) not null,
+	lng varchar(20) not null,
+	type int not null,
+	radius varchar(20) not null,
+	PRIMARY KEY (id),
+	FOREIGN KEY (deployment) REFERENCES deployments(id)
+);
+
+CREATE TABLE obstacles (
+	id mediumint not null auto_increment,
+	deployment mediumint not null,
+	lat varchar(20) not null,
+	lng varchar(20) not null,
+	obs int not null,
+	PRIMARY KEY (id),
+	FOREIGN KEY (deployment) REFERENCES deployments(id)
+);
+
+INSERT INTO hw_platforms (name, range_, rate, voltage, frequency, ram, flash, energy, rx, cost) VALUES
+	('Mica', 60.96, 40, 3, 916, 4, 128, 31320, 3.8, 70),
+	('Mica2', 152.4, 38.4, 3.3, 916, 4, 128, 31320, 9.6, 120),
+	('Mica2dot', 152.4, 38.4, 3.3, 916, 4, 128, 31320, 9.6, 132),
+	('MicaZ', 100, 150, 3.3, 2400, 4, 128, 31320, 19.7, 150),
+	('TelosB', 100, 250, 3, 2400, 10, 48, 31320, 0, 220),
+	('IRIS', 300, 250, 3.3, 2400, 8, 128, 31320, 0, 300),
+	('Imote2', 30, 250, 4.5, 2400, 256, 32768, 52870, 0, 170),
+	('ETRX2-DVKA', 150, 250, 3.6, 2400, 4, 128, 62640, 0, 270),
+	('G-Node G301', 30, 500, 33, 916, 8, 256, 52870, 0, 190),
+	('eko Plus', 450, -1, -1, 2400, -1, -1, 46980, 0, 210),
+	('XYZ Node', 1, 250, 3.3, 2400, 32, 256, 46980, 0, 1),
+	('TinyNode 584', 1, 152, 3, 868, 10, 48, 31320, 0, 1);
