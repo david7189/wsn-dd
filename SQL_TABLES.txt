@@ -1,3 +1,10 @@
+DROP TABLE users_deployments;
+DROP TABLE google_users;
+DROP TABLE nodes;
+DROP TABLE obstacles;
+DROP TABLE deployments;
+DROP TABLE hw_platforms;
+
 CREATE TABLE google_users (
 	id varchar(30) not null,
 	name varchar(100) not null,
@@ -25,8 +32,8 @@ CREATE TABLE deployments (
 	id mediumint not null auto_increment,
 	name CHAR(50) not null,
 	defnode mediumint not null,
-	budget float not null,
-	budremain float not null,
+	budget char(100) not null,
+	budremain char(100) not null,
 	budtype char(10) not null,
 	step int not null,
 	zoom int,
@@ -53,6 +60,8 @@ CREATE TABLE nodes (
 	lng varchar(20) not null,
 	type int not null,
 	radius varchar(20) not null,
+	gateway int not null,
+	sensors varchar(250),
 	PRIMARY KEY (id),
 	FOREIGN KEY (deployment) REFERENCES deployments(id)
 );

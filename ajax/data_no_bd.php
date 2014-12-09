@@ -3,12 +3,9 @@
 		$amount = $_POST['amount'];
 		$from = $_POST['from'];
 		$to = $_POST['to'];
-		$url = 'https://www.google.com/finance/converter?a=' . $amount . '&from=' . $from . '&to=' . $to;
-		$get = file_get_contents($url);
-		$get = explode('<span class=bld>', $get);
-		$get = explode('</span>', $get[1]);
-		$converted_amount = preg_replace("/[^0-9\.]/", null, $get[0]);
-		echo $converted_amount;
+		$url = 'http://www.x-rates.com/calculator/?from=' . $from . '&to=' . $to . '&amount=' . $amount;
+		$get = explode('<span class="ccOutputRslt">', file_get_contents($url))[1];
+		echo str_replace(',', '', explode('<span', $get)[0]);
 		if(isset($_POST['it'])) echo ', ' . $_POST['it'];
 	}
 ?>

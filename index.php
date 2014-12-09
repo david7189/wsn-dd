@@ -73,6 +73,9 @@
 				<div id="options-dialog" title="Hello">
 					<p id="options-dtext">&nbsp;</p>
 				</div>
+				<div id="loading-dialog">
+					<img src="images/ajax-loader.gif" />
+				</div>
 		<?php
 			} else {
 		?>

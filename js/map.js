@@ -190,6 +190,7 @@ function initialize() {
 function changeVals(d, to) {
 	window.change.push(d);
 	if(window.change.length == window.hw.length-2) {
+		window.loading.dialog('close');
 		for(i = 0; i < window.change.length; ++i) {
 			ch = JSON.parse('[' + window.change[i] + ']');
 			window.hw[ch[1]][10] = ch[0];
@@ -265,6 +266,7 @@ function initialForm() {
 					jQuery('#ini-opt-deftype').html(chain);
 					var prevbudtype = jQuery('#ini-opt-budtype option:selected').text();
 					jQuery('#ini-opt-budtype').change(function() {
+						window.loading.dialog('open');
 						if(jQuery('#ini-opt-budget').val() != '') {
 							jQuery.ajax({
 								type: 'post',
@@ -377,6 +379,17 @@ function initialForm() {
 							eval('map.setMapTypeId(google.maps.MapTypeId.' + loaded[jQuery('#ini-load-d option:selected').val()][10].toUpperCase() + ')');
 							map.setCenter(new google.maps.LatLng(loaded[jQuery('#ini-load-d option:selected').val()][8], loaded[jQuery('#ini-load-d option:selected').val()][9]));
 							map.setZoom(loaded[jQuery('#ini-load-d option:selected').val()][7]);
+							window.loading.dialog('open');
+							for(i = 2; i < window.hw.length; ++i) {
+								jQuery.ajax({
+									type: 'post',
+									url: 'ajax/data_no_bd.php',
+									data: {'it': i, 'amount': window.hw[i][10], 'from': 'GBP', 'to': window.budType, 'action': 'curr_conv'},
+									success: function(data) {
+										changeVals(data);
+									}
+								});
+							}
 							jQuery.ajax({
 								type: 'post',
 								url: 'ajax/data.php',
@@ -384,7 +397,7 @@ function initialForm() {
 								success: function(data) {
 									var nodes = JSON.parse(data.substring(0, data.length-1) + ']');
 									for(var i = 0; i < nodes.length; ++i) {
-										createMarker(new google.maps.LatLng(nodes[i][0], nodes[i][1]), false, nodes[i][3], false);
+										createMarker(new google.maps.LatLng(nodes[i][0], nodes[i][1]), false, nodes[i][3], false, nodes[i][4], nodes[i][5]);
 										window.markers[i].set('type', nodes[i][2]);
 									}
 									createLines();
@@ -440,7 +453,61 @@ function initialForm() {
 		} else {
 			jQuery('#new-deployment').html('');
 			jQuery('#load-deployment').html('');
-			jQuery('#man-deployment').html('holas');
+			jQuery('#man-deployment').html('<table class="ini-opt-class"><tr><td>' + window.iniForm[window.lang][13] + '</td><td><select multiple id="ini-share-d"></select></td></tr>\
+			<tr><td>' + window.iniForm[window.lang][14] + '</td><td><select multiple id="ini-share2-d"></select></td></tr>\
+			<tr><td /><td><div id="submit-share-d">' + window.iniForm[window.lang][7] + '</div></td></tr></table>');
+			jQuery.ajax({
+				type: 'post',
+				url: 'ajax/data.php',
+				data: {'action': 'search_deployments_share'},
+				success: function(data) {
+					jQuery.ajax({
+						type: 'post',
+						url: 'ajax/data.php',
+						data: {'action': 'search_users'},
+						success: function(data) {
+							if(data.length != 0) {
+								var users = JSON.parse(data.substring(0, data.length-1) + ']');
+								var select = '';
+								for(i = 0; i < users.length; ++i) {
+									select += '<option value="' + i + '">' + users[i][1] + '</option>';
+								}
+								jQuery('#ini-share2-d').html(select);
+							}
+							jQuery('#submit-share-d').click(function() {
+								if(jQuery('#ini-share-d').val() == null || jQuery('#ini-share2-d').val() == null) {
+									alert(window.iniForm[window.lang][15]);
+								} else {
+									var depl = [];
+									var usr = [];
+									for(var i = 0; i < jQuery('#ini-share-d').val().length; ++i) {
+										depl.push(deploym[jQuery('#ini-share-d').val()[i]][0]);
+									}
+									for(var j = 0; j < jQuery('#ini-share2-d').val().length; ++j) {
+										usr.push(users[jQuery('#ini-share2-d').val()[j]][0]);
+									}
+									jQuery.ajax({
+										type: 'post',
+										url: 'ajax/data.php',
+										data: {'action': 'share_deployments', 'deployments': depl, 'users': usr},
+										success: function(data) {
+											alert(window.iniForm[window.lang][16]);
+										}
+									});
+								}
+							});
+						}
+					});
+					if(data.length != 0) {
+						var deploym = JSON.parse(data.substring(0, data.length-1) + ']');
+						var select = '';
+						for(i = 0; i < deploym.length; ++i) {
+							select += '<option value="' + i + '">' + deploym[i][1] + '</option>';
+						}
+						jQuery('#ini-share-d').html(select);
+					}
+				}
+			});
 		}
 	});
 }
@@ -450,14 +517,18 @@ function saveState() {
 		var markersLat = '';
 		var markersLng = '';
 		var markersType = '';
+		var markersGate = '';
 		var circlesRad = '';
 		var blockMarkersLat = '';
 		var blockMarkersLng = '';
+		var sensors = '';
 		for(var i = 0; i < window.markers.length; ++i) {
 			markersLat += window.markers[i].position.lat() + ',';
 			markersLng += window.markers[i].position.lng() + ',';
 			markersType += window.markers[i].get('type') + ',';
+			markersGate += window.markers[i].get('gateway') + ',';
 			circlesRad += window.circles[i].getRadius() + ',';
+			sensors += jQuery(window.imgs[i]).html().replace(/"/g, '\'') + ',';
 		}
 		for(var i = 0; i < window.blockMarkers.length; ++i) {
 			for(var j = 0; j < window.blockMarkers[i].length; ++j) {
@@ -468,9 +539,9 @@ function saveState() {
 		jQuery.ajax({
 			type: 'post',
 			url: 'ajax/data.php',
-			data: {'action': 'insert_nodes', 'lat': markersLat, 'lng': markersLng, 'id-deploy': window.idDeploy, 'type': markersType, 'radius': circlesRad,
+			data: {'action': 'insert_nodes', 'lat': markersLat, 'lng': markersLng, 'id-deploy': window.idDeploy, 'type': markersType, 'gate': markersGate, 'radius': circlesRad,
 				'zoom': map.getZoom(), 'maptype': map.getMapTypeId(), 'center': map.getCenter().lat() + ',' + map.getCenter().lng(), 'step': window.currentOption,
-				'block-lat': blockMarkersLat, 'block-lng': blockMarkersLng, 'budremain': window.budget},
+				'block-lat': blockMarkersLat, 'block-lng': blockMarkersLng, 'budremain': window.budget, 'sensors': sensors},
 			success: function(data) {
 				jQuery('#state-text').text(window.confirmStates[window.lang][0]);
 				window.dialog.dialog('open');
@@ -578,14 +649,18 @@ function deleteMarker(i, type) {
 	jQuery('#bud-amnt').text(window.budget);
 	window.markers[i-1].setMap(null);
 	window.circles[i-1].setMap(null);
+	window.dispImg[i-1].close();
 	for(var j = i; j < window.markers.length; j++) {
 		window.markers[j].id--;
 		window.circles[j].id--;
-		window.markers[j].setIcon('http://gmaps-samples.googlecode.com/svn/trunk/markers/red/marker' + window.circles[j].id + '.png');
+		var color = (window.markers[j].get('gateway') == '1') ? 'orange' : 'red';
+		window.markers[j].setIcon('http://gmaps-samples.googlecode.com/svn/trunk/markers/' + color + '/marker' + window.circles[j].id + '.png');
 	}
 	window.counter--;
 	window.markers.splice(i-1, 1);
 	window.circles.splice(i-1, 1);
+	window.dispImg.splice(i-1, 1);
+	window.imgs.splice(i-1, 1);
 	createLines();
 }
 
@@ -625,6 +700,8 @@ function initializeVariables() {
 	window.counter = 1;
 	window.lang = 'en';
 	window.polygons = [];
+	window.imgs = [];
+	window.dispImg = [];
 	window.placeDiv = {'en': 'Search Box', 'es': 'Búsqueda'}
 	window.title = {'en': 'Wireless Sensor Network Deployment Design', 'es': 'Diseño de Despliegue de Redes Inalámbricas de Sensores'};
 	window.tabName = {'en': 'Wireless Sensor Network Deployment Design', 'es': 'Diseño de Despliegue de Redes Inalámbricas de Sensores'};
@@ -640,11 +717,13 @@ function initializeVariables() {
 	window.noMasNodos = {'en': 'There is no more budget for this node', 'es': 'No hay más presupuesto para este nodo'};
 	window.iniForm = {'en': ['What would you like to do?', 'Create a new deployment', 'Load a pre-existing deployment', 'Manage deployments', 
 		'Please select a name for the deployment', 'Please select a default node type', 'Please select available budget', 'Submit',
-		'Please define all fields', 'Budget is too low', 'Name already exists', 'Select a deployment to load', 'No deployments to load'],
+		'Please define all fields', 'Budget is too low', 'Name already exists', 'Select a deployment to load', 'No deployments to load',
+		'Select the deployments to share', 'Select the users to share to', 'Please select at least one of each box', 'Deployments shared successfully'],
 		'es': ['Qué desea hacer?', 'Crear un nuevo despliegue', 'cargar un despliegue pre-existente',
 		'Administrar despliegues', 'Seleccione un nombre para el despliegue', 'Seleccione un tipo de nodo por defecto',
 		'Seleccione el presupuesto disponible', 'Enviar', 'Por favor defina todos los campos', 'El presupuesto es muy bajo', 'El nombre ya existe',
-		'Seleccione el despliegue a cargar', 'No hay depliegues para cargar']};
+		'Seleccione el despliegue a cargar', 'No hay depliegues para cargar', 'Seleccione los despliegues para compartir', 'Seleccione los usuarios a quiénes compartir',
+		'Por favor elija al menos uno de cada cuadro', 'Los depliegues han sido compartidos exitosammente']};
 	window.confirmStates = {'en': ['State Saved', 'State Loaded', 'No Previous Data'], 'es': ['Estado Guardado', 'Estado Cargado', 'No Hay Datos Previos']};
 	window.optionNames = {'en': ['Select Area', 'Define Obstcles', 'Place Nodes'], 'es': ['Elegir Área', 'Definir Obstáculos', 'Ubicar Nodos']};
 	window.optionDescriptions = {'en': ['This is the first stage of the <span style="font-weight:bold;">"Wireless Sensor Network Deployment Design"</span> tool.<br /><br /> \
@@ -682,6 +761,13 @@ function initializeVariables() {
 		window.optionsIni.dialog({
 			position: {my: 'top left', at: 'top left', of: jQuery('#container')}
 		});
+	});
+	window.loading = jQuery('#loading-dialog').dialog({
+		autoOpen: false,
+		height: 100,
+		width: 100,
+		modal: true,
+		dialogClass: 'loading-dia'
 	});
 }
 
@@ -798,13 +884,23 @@ function createObstacle(div) {
 }
 
 function callMenu(marker) {
+	var boxSensors = document.createElement('div');
+    jQuery(boxSensors).addClass('menu-sensors');
 	var boxText = document.createElement('div');
     jQuery(boxText).addClass('menu-mark-container');
+	jQuery(boxSensors).html('<input type="checkbox" name="sens" value="1" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('1') >= 0 ? 'checked' : '') + ' /> Pressure<br /> \
+		<input type="checkbox" name="sens" value="2" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('2') >= 0 ? 'checked' : '') + ' /> Temperature<br /> \
+		<input type="checkbox" name="sens" value="3" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('3') >= 0 ? 'checked' : '') + ' /> Light<br /> \
+		<input type="checkbox" name="sens" value="4" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('4') >= 0 ? 'checked' : '') + ' /> Humidity<br /> \
+		<input type="checkbox" name="sens" value="5" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('5') >= 0 ? 'checked' : '') + ' /> Magnetic Field<br /> \
+		<input type="checkbox" name="sens" value="6" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('6') >= 0 ? 'checked' : '') + ' /> GPS');
 	var delMark = document.createElement('div');
 	var typeSel = document.createElement('div');
+	var gateNode = document.createElement('div');
 	jQuery(delMark).addClass('menu-mark');
+	jQuery(gateNode).addClass('gate-mark');
 	jQuery(typeSel).addClass('type-mark');
-	jQuery(delMark).add(typeSel).hover(function() {
+	jQuery(delMark).add(typeSel).add(gateNode).add(boxSensors).hover(function() {
 			jQuery(this).css({'color': '#3f3f3f', 'background-color': '#dadada', 'border': '1px solid #3f3f3f', 'padding': '1px'});
 		},
 		function() {
@@ -816,9 +912,19 @@ function callMenu(marker) {
 	for(var i = 2; i < window.hw.length; ++i) {
 		typeSelHtml += '<input type="radio" name="rad' + id + '" value="' + (i - 1) + '" />' + window.hw[i][1] + '<br />';
 	}
+	jQuery(gateNode).html('<input type="checkbox" name="gate" value="1" /> Gateway Node');
 	jQuery(typeSel).html(typeSelHtml);
-	boxText.appendChild(delMark);
-	boxText.appendChild(typeSel);
+	var tableText = document.createElement('table');
+	tableTr = tableText.insertRow(0);
+	tableTd1 = tableTr.insertCell(0);
+	jQuery(tableTd1).css({'vertical-align': 'top'});
+	tableTd1.appendChild(delMark);
+	tableTd1.appendChild(gateNode);
+	tableTd1.appendChild(boxSensors);
+	tableTd2 = tableTr.insertCell(1);
+	jQuery(tableTd2).css({'vertical-align': 'top'});
+	tableTd2.appendChild(typeSel);
+	boxText.appendChild(tableText);
 	var options = {
 		content: boxText,
 		disableAutoPan: false,
@@ -827,7 +933,7 @@ function callMenu(marker) {
 		zIndex: null,
 		boxStyle: {
 			opacity: 0.9,
-			width: '160px'
+			width: '302px'
 		},
 		closeBoxMargin: '12px 4px 4px 4px',
 		closeBoxURL: 'http://www.google.com/intl/en_us/mapfiles/close.gif',
@@ -839,6 +945,8 @@ function callMenu(marker) {
 	var ib = new InfoBox(options);
 	ib.open(map, marker);
 	jQuery(typeSel).children().filter('[value="' + marker.get('type') + '"]').prop('checked', true);
+	if(marker.get('gateway') == '1')
+		jQuery(gateNode).children().filter('[value="1"]').prop('checked', true);
 	jQuery(delMark).mouseup(function() {
 		deleteMarker(marker.id, marker.get('type'));
 		ib.close();
@@ -855,6 +963,25 @@ function callMenu(marker) {
 			jQuery(typeSel).children().filter('[value="' + marker.get('type') + '"]').prop('checked', true);
 			alert(window.noMasNodos[window.lang]);
 		}
+	});
+	jQuery(gateNode).change(function() {
+		if(jQuery('input:checkbox[name=gate]:checked').val() == '1') {
+			marker.setIcon('http://gmaps-samples.googlecode.com/svn/trunk/markers/orange/marker' + marker.id + '.png');
+			marker.set('gateway', 1);
+		} else {
+			marker.setIcon('http://gmaps-samples.googlecode.com/svn/trunk/markers/red/marker' + marker.id + '.png');
+			marker.set('gateway', 0);
+		}
+	});
+	jQuery(boxSensors).change(function() {
+		var searchIds = jQuery('input:checkbox[name=sens]:checked').map(function(){
+			return $(this).val();
+		}).get();
+		var searchText = '';
+		for(var i = 0; i < searchIds.length; ++i) {
+			searchText += '<img src="images/sensors-img/' + searchIds[i] + '.png" /><br />';
+		}
+		jQuery(window.imgs[marker.id-1]).html(searchText);
 	});
 }
 
@@ -896,9 +1023,12 @@ function callBlockMenu(block) {
 	});
 }
 
-function createMarker(e, lines, r, decrease) {
+function createMarker(e, lines, r, decrease, gateway, sensors) {
 	if(typeof(r) === 'undefined') r = parseFloat(window.hw[parseInt(window.defaultType) + 1][2]);
 	if(typeof(decrease) === 'undefined') decrease = true;
+	if(typeof(gateway) === 'undefined') gateway = 0;
+	if(typeof(sensors) === 'undefined') sensors = '';
+	var color = (gateway == 0) ? 'red' : 'orange';
 	if(window.budget > parseFloat(window.hw[parseInt(window.defaultType) + 1][10])) {
 		if(decrease == true)
 			window.budget -= parseFloat(window.hw[parseInt(window.defaultType) + 1][10]);
@@ -908,9 +1038,10 @@ function createMarker(e, lines, r, decrease) {
 			map: map,
 			id: window.counter,
 			draggable:true,
-			icon: 'http://gmaps-samples.googlecode.com/svn/trunk/markers/red/marker' + window.counter + '.png'
+			icon: 'http://gmaps-samples.googlecode.com/svn/trunk/markers/' + color + '/marker' + window.counter + '.png'
 		});
 		marker.set('type', window.defaultType);
+		marker.set('gateway', gateway);
 		google.maps.event.addListener(marker, 'rightclick', function() {
 			callMenu(marker);
 		});
@@ -950,6 +1081,29 @@ function createMarker(e, lines, r, decrease) {
 	} else {
 		alert(window.noMasNodos[window.lang]);
 	}
+	var vimgs = document.createElement('div');
+	jQuery(vimgs).html(sensors);
+	jQuery(vimgs).addClass('class-imgs');
+	var optionsImgs = {
+		content: vimgs,
+		disableAutoPan: false,
+		maxWidth: 0,
+		pixelOffset: new google.maps.Size(-28, -45),
+		zIndex: null,
+		closeBoxURL: '',
+		boxStyle: {
+			opacity: 1,
+			width: '20px'
+		},
+		infoBoxClearance: new google.maps.Size(1, 1),
+		isHidden: false,
+		pane: 'floatPane',
+		enableEventPropagation: false
+	};
+	var dispImgs = new InfoBox(optionsImgs);
+	dispImgs.open(map, marker);
+	window.imgs.push(vimgs);
+	window.dispImg.push(dispImgs);
 }
 
 function createBlockMarker(e, valor, blocks) {

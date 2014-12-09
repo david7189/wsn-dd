@@ -32,7 +32,7 @@ body {
 #new-deployment, #man-deployment, #load-deployment {
 	margin-left: 30px;
 }
-#ini-load-d {
+#ini-load-d, #ini-share-d, #ini-share2-d {
 	width: 404px;
 }
 #ini-opt-name, #ini-opt-type {
@@ -70,12 +70,16 @@ body {
 	-ms-user-select: none;
 	user-select: none;
 }
-#confirm-state, #options-dialog {
+#confirm-state, #options-dialog, #loading-dialog {
 	display: none;
 	font-size: 14px;
 	font-weight: bold;
 	line-height: 10px;
 	text-align: center;
+}
+.loading-dia {
+	border: none;
+	background: transparent;
 }
 .state-close {
 	position: absolute;
@@ -96,7 +100,7 @@ body {
 .ui-dialog-titlebar {
 	display:none;
 }
-#saveState, #loadState, #submit-new-d, #submit-load-d {
+#saveState, #loadState, #submit-new-d, #submit-load-d, #submit-share-d {
 	float:left;
 	text-shadow: none;
 	background-color: #d7d7d7;
@@ -122,7 +126,7 @@ body {
 	user-select: none;
 	color: #3f3f3f;
 }
-#saveState:hover, #loadState:hover, #submit-new-d:hover, #submit-load-d:hover {
+#saveState:hover, #loadState:hover, #submit-new-d:hover, #submit-load-d:hover, #submit-share-d:hover {
 	box-shadow: inset -1px -1px 8px #a8a8a8;
 	background-color: #dcdcdc;
 }
@@ -365,7 +369,7 @@ a {
 	bottom: -20px;
 	top: auto;
 }
-.menu-mark, .menu-mark-block, .type-mark {
+.menu-mark, .menu-mark-block, .type-mark , .gate-mark, .menu-sensors {
 	width: 128px;
 	background-color: #c6c6c6;
 	color: #3c3c3c;

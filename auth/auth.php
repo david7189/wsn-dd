@@ -39,4 +39,5 @@
 			header('Location: ' . $authUrl);
 		}
 	}
+	mysqli_close($connection);
 ?>
