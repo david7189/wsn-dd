@@ -1,4 +1,5 @@
 <?php
+	set_time_limit(180);
 	if(isset($_POST['action']) && $_POST['action'] == 'curr_conv') {
 		$amount = $_POST['amount'];
 		$from = $_POST['from'];

@@ -650,6 +650,7 @@ function deleteMarker(i, type) {
 	window.markers[i-1].setMap(null);
 	window.circles[i-1].setMap(null);
 	window.dispImg[i-1].close();
+	window.disX[i-1].close();
 	for(var j = i; j < window.markers.length; j++) {
 		window.markers[j].id--;
 		window.circles[j].id--;
@@ -661,6 +662,7 @@ function deleteMarker(i, type) {
 	window.circles.splice(i-1, 1);
 	window.dispImg.splice(i-1, 1);
 	window.imgs.splice(i-1, 1);
+	window.x.splice(i-1, 1);
 	createLines();
 }
 
@@ -702,12 +704,20 @@ function initializeVariables() {
 	window.polygons = [];
 	window.imgs = [];
 	window.dispImg = [];
+	window.x = [];
+	window.disX	= [];
+	window.testCon = {'en': ['Connectivity', 'Bottleneck effects', 'Single point of failure', 'Submit', 'There are no gateways in the deployment',
+		'Node ', 'Nodes ', ' is disconnected', ' are disconnected', ' has no path to a gateway', ' have no path to a gateway', 'All tests passed'],
+		'es': ['Conectividad', 'Efectos de cuello de botella', 'Punto único de fallo', 'Enviar', 'No hay gateways en el despliegue',
+		'El nodo ', 'Los nodos ', ' está desconectado', ' están desconectados', ' no tiene una ruta hacia el gateway', ' no tienen una ruta hacia el gateway', 'Todas las pruebas pasaron']};
+	window.nodeMenu = {'en': ['Gateway Node', 'Pressure', 'Temperature', 'Light', 'Humidity', 'Magnetic Field', 'GPS'],
+		'es': ['Nodo Gateway', 'Presión', 'Temperatura', 'Luz', 'Humedad', 'Campo Magnético', 'GPS']};
 	window.placeDiv = {'en': 'Search Box', 'es': 'Búsqueda'}
 	window.title = {'en': 'Wireless Sensor Network Deployment Design', 'es': 'Diseño de Despliegue de Redes Inalámbricas de Sensores'};
 	window.tabName = {'en': 'Wireless Sensor Network Deployment Design', 'es': 'Diseño de Despliegue de Redes Inalámbricas de Sensores'};
 	window.arrows = {'en': ['< Previous', 'Next >'], 'es': ['< Anterior', 'Siguiente >']};
 	window.states = {'en': ['Save State', 'Load State'], 'es': ['Guardar Estado', 'Cargar Estado']};
-	window.options = ['Area', 'Obstacles', 'Nodes'];
+	window.options = ['Area', 'Obstacles', 'Nodes', 'Design'];
 	window.obsName = {'en': 'Obstacle ', 'es': 'Obstáculo '};
 	window.menuText = {'en': ['Delete Node', 'Delete Obstacle'], 'es': ['Borrar Nodo', 'Borrar Obstáculo']};
 	window.newObs = {'en': 'New Obstacle', 'es': 'Nuevo Obstáculo'};
@@ -725,7 +735,7 @@ function initializeVariables() {
 		'Seleccione el despliegue a cargar', 'No hay depliegues para cargar', 'Seleccione los despliegues para compartir', 'Seleccione los usuarios a quiénes compartir',
 		'Por favor elija al menos uno de cada cuadro', 'Los depliegues han sido compartidos exitosammente']};
 	window.confirmStates = {'en': ['State Saved', 'State Loaded', 'No Previous Data'], 'es': ['Estado Guardado', 'Estado Cargado', 'No Hay Datos Previos']};
-	window.optionNames = {'en': ['Select Area', 'Define Obstcles', 'Place Nodes'], 'es': ['Elegir Área', 'Definir Obstáculos', 'Ubicar Nodos']};
+	window.optionNames = {'en': ['Select Area', 'Define Obstacles', 'Place Nodes', 'Validate Design'], 'es': ['Elegir Área', 'Definir Obstáculos', 'Ubicar Nodos', 'Validar Diseño']};
 	window.optionDescriptions = {'en': ['This is the first stage of the <span style="font-weight:bold;">"Wireless Sensor Network Deployment Design"</span> tool.<br /><br /> \
 		Choose the Area you want to work in and once you\'re comfortable, click on <span style="font-weight:bold;">Next</span>.<br /><br />To open back this \
 		Tooltip in case you close it, click on ',
@@ -888,12 +898,12 @@ function callMenu(marker) {
     jQuery(boxSensors).addClass('menu-sensors');
 	var boxText = document.createElement('div');
     jQuery(boxText).addClass('menu-mark-container');
-	jQuery(boxSensors).html('<input type="checkbox" name="sens" value="1" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('1') >= 0 ? 'checked' : '') + ' /> Pressure<br /> \
-		<input type="checkbox" name="sens" value="2" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('2') >= 0 ? 'checked' : '') + ' /> Temperature<br /> \
-		<input type="checkbox" name="sens" value="3" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('3') >= 0 ? 'checked' : '') + ' /> Light<br /> \
-		<input type="checkbox" name="sens" value="4" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('4') >= 0 ? 'checked' : '') + ' /> Humidity<br /> \
-		<input type="checkbox" name="sens" value="5" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('5') >= 0 ? 'checked' : '') + ' /> Magnetic Field<br /> \
-		<input type="checkbox" name="sens" value="6" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('6') >= 0 ? 'checked' : '') + ' /> GPS');
+	jQuery(boxSensors).html('<input type="checkbox" name="sens" value="1" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('1') >= 0 ? 'checked' : '') + ' /> ' + window.nodeMenu[window.lang][1] + '<br /> \
+		<input type="checkbox" name="sens" value="2" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('2') >= 0 ? 'checked' : '') + ' /> ' + window.nodeMenu[window.lang][2] + '<br /> \
+		<input type="checkbox" name="sens" value="3" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('3') >= 0 ? 'checked' : '') + ' /> ' + window.nodeMenu[window.lang][3] + '<br /> \
+		<input type="checkbox" name="sens" value="4" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('4') >= 0 ? 'checked' : '') + ' /> ' + window.nodeMenu[window.lang][4] + '<br /> \
+		<input type="checkbox" name="sens" value="5" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('5') >= 0 ? 'checked' : '') + ' /> ' + window.nodeMenu[window.lang][5] + '<br /> \
+		<input type="checkbox" name="sens" value="6" ' + (jQuery(window.imgs[marker.id-1]).html().indexOf('6') >= 0 ? 'checked' : '') + ' /> ' + window.nodeMenu[window.lang][6]);
 	var delMark = document.createElement('div');
 	var typeSel = document.createElement('div');
 	var gateNode = document.createElement('div');
@@ -912,7 +922,7 @@ function callMenu(marker) {
 	for(var i = 2; i < window.hw.length; ++i) {
 		typeSelHtml += '<input type="radio" name="rad' + id + '" value="' + (i - 1) + '" />' + window.hw[i][1] + '<br />';
 	}
-	jQuery(gateNode).html('<input type="checkbox" name="gate" value="1" /> Gateway Node');
+	jQuery(gateNode).html('<input type="checkbox" name="gate" value="1" /> ' + window.nodeMenu[window.lang][0]);
 	jQuery(typeSel).html(typeSelHtml);
 	var tableText = document.createElement('table');
 	tableTr = tableText.insertRow(0);
@@ -933,7 +943,7 @@ function callMenu(marker) {
 		zIndex: null,
 		boxStyle: {
 			opacity: 0.9,
-			width: '302px'
+			width: '326px'
 		},
 		closeBoxMargin: '12px 4px 4px 4px',
 		closeBoxURL: 'http://www.google.com/intl/en_us/mapfiles/close.gif',
@@ -1104,6 +1114,29 @@ function createMarker(e, lines, r, decrease, gateway, sensors) {
 	dispImgs.open(map, marker);
 	window.imgs.push(vimgs);
 	window.dispImg.push(dispImgs);
+	var v_x = document.createElement('div');
+	jQuery(v_x).html('');
+	jQuery(vimgs).addClass('class-x');
+	var optionsX = {
+		content: v_x,
+		disableAutoPan: false,
+		maxWidth: 0,
+		pixelOffset: new google.maps.Size(6, -32),
+		zIndex: null,
+		closeBoxURL: '',
+		boxStyle: {
+			opacity: 1,
+			width: '30px'
+		},
+		infoBoxClearance: new google.maps.Size(1, 1),
+		isHidden: false,
+		pane: 'floatPane',
+		enableEventPropagation: false
+	};
+	var disp_x = new InfoBox(optionsX);
+	disp_x.open(map, marker);
+	window.x.push(v_x);
+	window.disX.push(disp_x);
 }
 
 function createBlockMarker(e, valor, blocks) {
@@ -1136,6 +1169,93 @@ function createBudgetDisplay() {
 	map.controls[google.maps.ControlPosition.TOP].push(budgetDisplayDiv);
 }
 
+function designValDiv() {
+	var desValDiv = document.createElement('div');
+	desValDiv.id = 'desValidation';
+	jQuery(desValDiv).addClass('design-val');
+	jQuery(desValDiv).html(window.testCon[window.lang][0] + '<br />' + window.testCon[window.lang][1] + '<br />' + window.testCon[window.lang][2] + '<br /><div id="submit-design">' + window.testCon[window.lang][3] + '</div>');
+	map.controls[google.maps.ControlPosition.RIGHT].push(desValDiv);
+	jQuery(desValDiv).on('click', function() {
+		if(testConnectivity()) {
+			alert(window.testCon[window.lang][11]);
+		}
+	});
+}
+
+function hasPath(i, nodesCon, state) {
+	if(state) window.deja = [];
+	if(window.markers[i].get('gateway') == 1) {
+		return true;
+	} else {
+		window.deja.push(i);
+		for(var j = 0; j < nodesCon[i].length; ++j) {
+			if(window.deja.indexOf(nodesCon[i][j]) < 0 && hasPath(nodesCon[i][j], nodesCon, false)) {
+				return true;
+			}
+		}
+		return false;
+	}
+}
+
+function testConnectivity() {
+	window.deja = [];
+	var baseStationExists = false;
+	badConnectivityNodes = [];
+	nodesWithNoPath = [];
+	var nodesCon = {};
+	for(var i = 0; i < window.markers.length; ++i) {
+		nodesCon[i] = [];
+		for(var j = 0; j < window.markers.length; ++j) {
+			if(i != j) {
+				if(computeDistance(new google.maps.LatLng(window.markers[i].getPosition().lat(), window.markers[i].getPosition().lng()),
+					new google.maps.LatLng(window.markers[j].getPosition().lat(), window.markers[j].getPosition().lng()), i, j)) {
+					nodesCon[i].push(j);
+				}
+			}
+		}
+		if(window.markers[i].get('gateway') == 1) {
+			baseStationExists = true;
+		} else if(nodesCon[i].length == 0) {
+			badConnectivityNodes.push(i);
+		}
+	}
+	if(!baseStationExists) {
+		alert(window.testCon[window.lang][4]);
+		return false;
+	} else {
+		for(var i = 0; i < window.markers.length; ++i) {
+			if(!hasPath(i, nodesCon, true)) {
+				nodesWithNoPath.push(i);
+			}
+		}
+		if(badConnectivityNodes.length > 0) {
+			text1 = (badConnectivityNodes.length == 1) ? window.testCon[window.lang][5] : window.testCon[window.lang][6];
+			text2 = (badConnectivityNodes.length == 1) ? window.testCon[window.lang][7] : window.testCon[window.lang][8];
+			var text = text1;
+			for(var i = 0; i < badConnectivityNodes.length; i++) {
+				text += (badConnectivityNodes[i]+1) + ', ';
+				jQuery(window.x[badConnectivityNodes[i]]).html('<img src="images/sensors-img/purple_x.png" />');
+			}
+			text = text.substr(0, text.length-2) + text2;
+			alert(text);
+			return false;
+		}
+		if(nodesWithNoPath.length > 0) {
+			text1 = (nodesWithNoPath.length == 1) ? window.testCon[window.lang][5] : window.testCon[window.lang][6];
+			text2 = (nodesWithNoPath.length == 1) ? window.testCon[window.lang][9] : window.testCon[window.lang][10];
+			var text = text1;
+			for(var i = 0; i < nodesWithNoPath.length; i++) {
+				text += (nodesWithNoPath[i]+1) + ', ';
+				jQuery(window.x[nodesWithNoPath[i]]).html('<img src="images/sensors-img/purple_x.png" />');
+			}
+			text = text.substr(0, text.length-2) + text2;
+			alert(text);
+			return false;
+		}
+	}
+	return true;
+}
+
 function buttons(opt) {
 	if(opt == 'Area') {
 		window.map.setOptions({
@@ -1151,6 +1271,7 @@ function buttons(opt) {
 		jQuery('#selectObstacles').hide();
 		jQuery('#createObstacle').hide();
 		jQuery('#budgetDisplay').hide();
+		jQuery('#desValidation').hide();
 		selectedBlock();
 		jQuery('#place-div').css('display', 'block');
 		jQuery('#clear-all').css('display', 'block');
@@ -1161,6 +1282,7 @@ function buttons(opt) {
 		staticOptions();
 		jQuery('#selectObstacles').hide();
 		jQuery('#createObstacle').hide();
+		jQuery('#desValidation').hide();
 		if(jQuery('#budgetDisplay').length == 0) {
 			createBudgetDisplay();
 		} else {
@@ -1175,6 +1297,7 @@ function buttons(opt) {
 		google.maps.event.removeListener(window.lis);
 		staticOptions();
 		jQuery('#budgetDisplay').hide();
+		jQuery('#desValidation').hide();
 		if(jQuery('#selectObstacles').length == 0) {
 			obsSelectorCall();
 		} else {
@@ -1185,6 +1308,18 @@ function buttons(opt) {
 		window.lis = google.maps.event.addListener(map, 'click', function(event) {
 			createBlockMarker(event.latLng, jQuery('#selectObstacles option:selected').val(), true);
 		});
+	}
+	if(opt == 'Design') {
+		google.maps.event.removeListener(window.lis);
+		staticOptions();
+		jQuery('#budgetDisplay').hide();
+		jQuery('#selectObstacles').hide();
+		jQuery('#createObstacle').hide();
+		if(jQuery('#desValidation').length == 0) {
+			designValDiv();
+		} else {
+			jQuery('#desValidation').show();
+		}
 	}
 }
 

@@ -53,7 +53,7 @@
 					<div id="Area" class="button" title="Area">&nbsp;</div>
 					<div id="Obstacles" class="button" title="Obstacles">&nbsp;</div>
 					<div id="Nodes" class="button" title="Nodes">&nbsp;</div>
-					<div class="button">other</div>
+					<div id="Design" class="button" title="Design">&nbsp;</div>
 					<div class="button">other</div>
 					<div id="last" class="button">other</div><p class="clear" />
 					<div id="move-prog"><span class="nextprev Previous">&nbsp;</span>  |  <span class="nextprev Next">&nbsp;</span></div>

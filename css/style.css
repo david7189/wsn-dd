@@ -100,7 +100,7 @@ body {
 .ui-dialog-titlebar {
 	display:none;
 }
-#saveState, #loadState, #submit-new-d, #submit-load-d, #submit-share-d {
+#saveState, #loadState, #submit-new-d, #submit-load-d, #submit-share-d, #submit-design {
 	float:left;
 	text-shadow: none;
 	background-color: #d7d7d7;
@@ -126,7 +126,10 @@ body {
 	user-select: none;
 	color: #3f3f3f;
 }
-#saveState:hover, #loadState:hover, #submit-new-d:hover, #submit-load-d:hover, #submit-share-d:hover {
+#submit-design {
+	margin-left: 32px;
+}
+#saveState:hover, #loadState:hover, #submit-new-d:hover, #submit-load-d:hover, #submit-share-d:hover , #submit-design:hover{
 	box-shadow: inset -1px -1px 8px #a8a8a8;
 	background-color: #dcdcdc;
 }
@@ -369,8 +372,23 @@ a {
 	bottom: -20px;
 	top: auto;
 }
+.design-val {
+	background-color: #fff;
+	border-radius: 3px;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	margin-right: 6px;
+	padding: 8px;
+	font-size: 14px;
+	cursor: default;
+	width: 200px;
+}
 .menu-mark, .menu-mark-block, .type-mark , .gate-mark, .menu-sensors {
-	width: 128px;
+	width: 140px;
 	background-color: #c6c6c6;
 	color: #3c3c3c;
 	padding: 2px;
