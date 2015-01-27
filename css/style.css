@@ -100,6 +100,9 @@ body {
 .ui-dialog-titlebar {
 	display:none;
 }
+#thresh {
+	width: 40px;
+}
 #saveState, #loadState, #submit-new-d, #submit-load-d, #submit-share-d, #submit-design {
 	float:left;
 	text-shadow: none;

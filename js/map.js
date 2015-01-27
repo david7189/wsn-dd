@@ -706,10 +706,14 @@ function initializeVariables() {
 	window.dispImg = [];
 	window.x = [];
 	window.disX	= [];
-	window.testCon = {'en': ['Connectivity', 'Bottleneck effects', 'Single point of failure', 'Submit', 'There are no gateways in the deployment',
+	window.testCon = {'en': ['Connectivity', 'Bottlenecks', 'Single point of failure', 'Submit', 'There are no gateways in the deployment',
 		'Node ', 'Nodes ', ' is disconnected', ' are disconnected', ' has no path to a gateway', ' have no path to a gateway', 'All tests passed'],
-		'es': ['Conectividad', 'Efectos de cuello de botella', 'Punto único de fallo', 'Enviar', 'No hay gateways en el despliegue',
+		'es': ['Conectividad', 'Cuellos de botella', 'Punto único de fallo', 'Enviar', 'No hay gateways en el despliegue',
 		'El nodo ', 'Los nodos ', ' está desconectado', ' están desconectados', ' no tiene una ruta hacia el gateway', ' no tienen una ruta hacia el gateway', 'Todas las pruebas pasaron']};
+	window.testBot = {'en': ['Node ', 'Nodes ', ' is a bottleneck', ' are bottlenecks'],
+		'es': ['El nodo ', 'Los nodos ', ' es un cuello de botella', ' son cuellos de botella']};
+	window.testSing = {'en': ['Node ', 'Nodes ', ' is a single point of failure', ' are single points of failure'],
+		'es': ['El nodo ', 'Los nodos ', ' es un punto único de fallo', ' son puntos únicos de fallo']};
 	window.nodeMenu = {'en': ['Gateway Node', 'Pressure', 'Temperature', 'Light', 'Humidity', 'Magnetic Field', 'GPS'],
 		'es': ['Nodo Gateway', 'Presión', 'Temperatura', 'Luz', 'Humedad', 'Campo Magnético', 'GPS']};
 	window.placeDiv = {'en': 'Search Box', 'es': 'Búsqueda'}
@@ -1173,23 +1177,85 @@ function designValDiv() {
 	var desValDiv = document.createElement('div');
 	desValDiv.id = 'desValidation';
 	jQuery(desValDiv).addClass('design-val');
-	jQuery(desValDiv).html(window.testCon[window.lang][0] + '<br />' + window.testCon[window.lang][1] + '<br />' + window.testCon[window.lang][2] + '<br /><div id="submit-design">' + window.testCon[window.lang][3] + '</div>');
+	jQuery(desValDiv).html('<table><tr><td height="38">' + window.testCon[window.lang][0] + '</td><td class="connec" height="38" /></tr><tr><td height="38">' + window.testCon[window.lang][1] + ' <input type="number" name="thresh" id="thresh" min="1" max="100" step="1" value="4"></td><td class="bottle" height="38" /></tr><tr><td height="38">' + window.testCon[window.lang][2] + '</td><td class="singlep" height="38" /></tr><tr><td colspan="2"><div id="submit-design">' + window.testCon[window.lang][3] + '</div></td></tr></table>');
 	map.controls[google.maps.ControlPosition.RIGHT].push(desValDiv);
-	jQuery(desValDiv).on('click', function() {
-		if(testConnectivity()) {
+	jQuery('#submit-design').on('click', function() {
+		var a = testConnectivity();
+		var b = testBottleneck();
+		var c = testSPF();
+		jQuery('.bottle').tooltip();
+		jQuery('.connec').tooltip();
+		jQuery('.singlep').tooltip();
+		if(a && b && c) {
 			alert(window.testCon[window.lang][11]);
 		}
 	});
 }
 
-function hasPath(i, nodesCon, state) {
+function testSPF() {
+	spofNodes = [];
+	for(var j = 0; j < window.markers.length; ++j) {
+		for(var i = 0; i < window.markers.length; ++i) {
+			if(i != j && window.nodesWithNoPath.indexOf(i) == -1 && !hasPath(i, window.nodesCon, true, j)) {
+				spofNodes.push(j);
+				break;
+			}
+		}
+	}
+	if(spofNodes.length > 0) {
+		var text1 = (spofNodes.length == 1) ? window.testSing[window.lang][0] : window.testSing[window.lang][1];
+		var text2 = (spofNodes.length == 1) ? window.testSing[window.lang][2] : window.testSing[window.lang][3];
+		for(var i = 0; i < spofNodes.length; ++i) {
+			if(jQuery(window.x[spofNodes[i]]).html() == '') {
+				jQuery(window.x[spofNodes[i]]).html('<img src="images/sensors-img/purple_alert.png" />');
+			}
+			text1 += (spofNodes[i]+1) + ', ';
+		}
+		text1 = text1.substr(0, text1.length-2) + text2;
+		alert(text1);
+		jQuery('.singlep').html('<img height="16" width="16" src="images/sensors-img/purple_alert.png" title="' + text1 + '" />');
+		return false;
+	}
+	jQuery('.singlep').html('<img src="images/sensors-img/green_check.png" />');
+	return true;
+}
+
+function testBottleneck() {
+	var bottleneckNodes = [];
+	var threshold = jQuery('#thresh').val();
+	for(var i = 0; i < window.markers.length; ++i) {
+		if(window.nodesCon[i].length > threshold) {
+			bottleneckNodes.push(i);
+		}
+	}
+	if(bottleneckNodes.length > 0) {
+		var text1 = (bottleneckNodes.length == 1) ? window.testBot[window.lang][0] : window.testBot[window.lang][1];
+		var text2 = (bottleneckNodes.length == 1) ? window.testBot[window.lang][2] : window.testBot[window.lang][3];
+		for(var i = 0; i < bottleneckNodes.length; ++i) {
+			if(jQuery(window.x[bottleneckNodes[i]]).html() == '') {
+				jQuery(window.x[bottleneckNodes[i]]).html('<img src="images/sensors-img/yellow_alert.png" />');
+			}
+			text1 += (bottleneckNodes[i]+1) + ', ';
+		}
+		text1 = text1.substr(0, text1.length-2) + text2;
+		alert(text1);
+		jQuery('.bottle').html('<img height="16" width="16" src="images/sensors-img/yellow_alert.png" title="' + text1 + '" />');
+		return false;
+	}
+	jQuery('.bottle').html('<img src="images/sensors-img/green_check.png" />');
+	return true;
+}
+
+function hasPath(i, nodesCon, state, proh) {
+	if(typeof(proh) === 'undefined') proh = -1;
 	if(state) window.deja = [];
 	if(window.markers[i].get('gateway') == 1) {
 		return true;
 	} else {
+		if(proh == i) return false;
 		window.deja.push(i);
 		for(var j = 0; j < nodesCon[i].length; ++j) {
-			if(window.deja.indexOf(nodesCon[i][j]) < 0 && hasPath(nodesCon[i][j], nodesCon, false)) {
+			if(window.deja.indexOf(nodesCon[i][j]) < 0 && hasPath(nodesCon[i][j], nodesCon, false, proh)) {
 				return true;
 			}
 		}
@@ -1201,8 +1267,8 @@ function testConnectivity() {
 	window.deja = [];
 	var baseStationExists = false;
 	badConnectivityNodes = [];
-	nodesWithNoPath = [];
-	var nodesCon = {};
+	window.nodesWithNoPath = [];
+	window.nodesCon = {};
 	for(var i = 0; i < window.markers.length; ++i) {
 		nodesCon[i] = [];
 		for(var j = 0; j < window.markers.length; ++j) {
@@ -1220,10 +1286,13 @@ function testConnectivity() {
 		}
 	}
 	if(!baseStationExists) {
+		jQuery('.connec').html('<img height="16" width="16" src="images/sensors-img/purple_x.png" title="' + window.testCon[window.lang][4] + '" />');
 		alert(window.testCon[window.lang][4]);
 		return false;
 	} else {
+		jQuery('.connec').html('<img src="images/sensors-img/green_check.png" />');
 		for(var i = 0; i < window.markers.length; ++i) {
+			jQuery(window.x[i]).html('');
 			if(!hasPath(i, nodesCon, true)) {
 				nodesWithNoPath.push(i);
 			}
@@ -1232,11 +1301,12 @@ function testConnectivity() {
 			text1 = (badConnectivityNodes.length == 1) ? window.testCon[window.lang][5] : window.testCon[window.lang][6];
 			text2 = (badConnectivityNodes.length == 1) ? window.testCon[window.lang][7] : window.testCon[window.lang][8];
 			var text = text1;
-			for(var i = 0; i < badConnectivityNodes.length; i++) {
+			for(var i = 0; i < badConnectivityNodes.length; ++i) {
 				text += (badConnectivityNodes[i]+1) + ', ';
 				jQuery(window.x[badConnectivityNodes[i]]).html('<img src="images/sensors-img/purple_x.png" />');
 			}
 			text = text.substr(0, text.length-2) + text2;
+			jQuery('.connec').html('<img height="16" width="16" src="images/sensors-img/purple_x.png" title="' + text + '" />');
 			alert(text);
 			return false;
 		}
@@ -1244,11 +1314,12 @@ function testConnectivity() {
 			text1 = (nodesWithNoPath.length == 1) ? window.testCon[window.lang][5] : window.testCon[window.lang][6];
 			text2 = (nodesWithNoPath.length == 1) ? window.testCon[window.lang][9] : window.testCon[window.lang][10];
 			var text = text1;
-			for(var i = 0; i < nodesWithNoPath.length; i++) {
+			for(var i = 0; i < nodesWithNoPath.length; ++i) {
 				text += (nodesWithNoPath[i]+1) + ', ';
 				jQuery(window.x[nodesWithNoPath[i]]).html('<img src="images/sensors-img/purple_x.png" />');
 			}
 			text = text.substr(0, text.length-2) + text2;
+			jQuery('.connec').html('<img height="16" width="16" src="images/sensors-img/purple_x.png" title="' + text + '" />');
 			alert(text);
 			return false;
 		}
