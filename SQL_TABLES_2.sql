@@ -1,9 +1,13 @@
-DROP TABLE users_deployments;
-DROP TABLE google_users;
-DROP TABLE nodes;
-DROP TABLE obstacles;
-DROP TABLE deployments;
-DROP TABLE hw_platforms;
+﻿DROP TABLE IF EXISTS users_deployments;
+DROP TABLE IF EXISTS google_users;
+DROP TABLE IF EXISTS sensors_streams;
+DROP TABLE IF EXISTS nodes_streams;
+DROP TABLE IF EXISTS sensors;
+DROP TABLE IF EXISTS streams;
+DROP TABLE IF EXISTS nodes;
+DROP TABLE IF EXISTS obstacles;
+DROP TABLE IF EXISTS deployments;
+DROP TABLE IF EXISTS hw_platforms;
 
 CREATE TABLE google_users (
 	id varchar(30) not null,
@@ -40,41 +44,87 @@ CREATE TABLE deployments (
 	centerlat varchar(20),
 	centerlng varchar(20),
 	type varchar(20),
+	last_date datetime not null,
+	last_used_by char(50) not null,
 	PRIMARY KEY (id),
 	FOREIGN KEY(defnode) REFERENCES hw_platforms(id)
+	ON DELETE CASCADE
 );
 
 CREATE TABLE users_deployments (
-	id mediumint not null auto_increment,
 	id_users char(50) not null,
-        id_deployments mediumint not null,
-	PRIMARY KEY (id),
+	id_deployments mediumint not null,
+	PRIMARY KEY (id_users, id_deployments),
 	FOREIGN KEY (id_users) REFERENCES google_users(id),
 	FOREIGN KEY (id_deployments) REFERENCES deployments(id)
+	ON DELETE CASCADE
 );
 
 CREATE TABLE nodes (
-	id mediumint not null auto_increment,
+	id mediumint not null,
 	deployment mediumint not null,
 	lat varchar(20) not null,
 	lng varchar(20) not null,
-	type int not null,
-	radius varchar(20) not null,
+	type_ mediumint not null,
 	gateway int not null,
-	sensors varchar(250),
-	PRIMARY KEY (id),
+	PRIMARY KEY (id, deployment),
+	FOREIGN KEY(type_) REFERENCES hw_platforms(id),
 	FOREIGN KEY (deployment) REFERENCES deployments(id)
+	ON DELETE CASCADE
 );
 
 CREATE TABLE obstacles (
-	id mediumint not null auto_increment,
+	id mediumint not null,
 	deployment mediumint not null,
 	lat varchar(20) not null,
 	lng varchar(20) not null,
 	obs int not null,
-	PRIMARY KEY (id),
+	PRIMARY KEY (id, deployment),
 	FOREIGN KEY (deployment) REFERENCES deployments(id)
+	ON DELETE CASCADE
 );
+
+CREATE TABLE streams (
+	id mediumint not null,
+	id_dep mediumint not null,
+	name CHAR(50) not null,
+	PRIMARY KEY (id, id_dep)
+);
+
+CREATE TABLE nodes_streams (
+	id_stream mediumint not null,
+	id_node mediumint not null,
+	id_dep mediumint not null,
+	PRIMARY KEY (id_stream, id_node, id_dep),
+	FOREIGN KEY (id_stream) REFERENCES streams(id),
+	FOREIGN KEY (id_node, id_dep) REFERENCES nodes(id, deployment)
+	ON DELETE CASCADE
+);
+
+CREATE TABLE sensors (
+	id mediumint not null auto_increment,
+	name_eng varchar(50) not null,
+	name_spa varchar(50) not null,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE sensors_streams (
+	id_sensor mediumint not null,
+	id_stream mediumint not null,
+	id_dep mediumint not null,
+	PRIMARY KEY (id_sensor, id_stream, id_dep),
+	FOREIGN KEY (id_sensor) REFERENCES sensors(id),
+	FOREIGN KEY (id_stream, id_dep) REFERENCES streams(id, id_dep)
+	ON DELETE CASCADE
+);
+
+INSERT INTO sensors (name_eng, name_spa) VALUES
+	('Pressure', 'Presión'),
+	('Temperature', 'Temperatura'),
+	('Light', 'Luz'),
+	('Humidity', 'Humedad'),
+	('Magnetic Field', 'Campo Magnético'),
+	('GPS', 'GPS');
 
 INSERT INTO hw_platforms (name, range_, rate, voltage, frequency, ram, flash, energy, rx, cost) VALUES
 	('Mica', 60.96, 40, 3, 916, 4, 128, 31320, 3.8, 70),
