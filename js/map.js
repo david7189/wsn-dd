@@ -1191,9 +1191,9 @@ function initializeVariables() {
 	window.closestSub = [];
 	window.nodeFileCoords = [];
 	window.designAlert = '';
-	window.streamErrTxt = {'en': 'You must create at least one stream and each stream must have at least one variable', 'es': 'Debe crear al menos un stream y cada stream debe tener al menos una variable'};
-	window.deply = {'en': ['Share Deployment', 'Modify Deployment', 'Delete Deployment', 'Select the deployments to delete', 'Please select at least one of the box', 'Deployments deleted succesfully', 'Select the deployment to modify', 'Retake deployment'],
-		'es': ['Compartir Despliegue', 'Modificar Despliegue', 'Borrar Despliegue', 'Seleccione los despliegues para borrar', 'Por favor elija al menos uno del cuadro', 'Los depliegues han sido borrados exitosamente', 'Seleccione el despliegue para modificar', 'Retomar despliegue']};
+	window.streamErrTxt = {'en': 'You must create at least one stream and each stream must have at least one attribute', 'es': 'Debe crear al menos un stream y cada stream debe tener al menos un atributo'};
+	window.deply = {'en': ['Share', 'Modify', 'Delete', 'Select the deployments to delete', 'Please select at least one of the box', 'Deployments deleted succesfully', 'Select the deployment to modify', 'Unshare'],
+		'es': ['Compartir', 'Modificar', 'Borrar', 'Seleccione los despliegues para borrar', 'Por favor elija al menos uno del cuadro', 'Los depliegues han sido borrados exitosamente', 'Seleccione el despliegue para modificar', 'Descompartir']};
 	window.xmls = {'en': ['Query', 'Query Parameters', 'Logical Schema', 'Topology', 'Physical Schema', 'Nodes'],
 		'es': ['Consulta', 'Par\u00E1metros de Consulta', 'Esquema L\u00F3gico', 'Topolog\u00EDa', 'Esquema F\u00EDsico', 'Nodos']};
 	window.fullscreen = {'en': ['Full Screen', 'Exit Full Screen'], 'es': ['Pantalla Completa', 'Salir Pantalla Completa']};
@@ -1236,7 +1236,7 @@ function initializeVariables() {
 		'Seleccione el despliegue a cargar', 'No hay depliegues para cargar', 'Seleccione los despliegues para compartir', 'Seleccione los usuarios a qui\u00E9nes compartir',
 		'Por favor elija al menos uno de cada cuadro', 'Los depliegues han sido compartidos exitosammente', 'El costo actual del despliegue es mayor al presupuesto actual', 'El depliegue ha sido actualizado exitosamente']};
 	window.confirmStates = {'en': ['State Saved', 'State Loaded', 'No Previous Data'], 'es': ['Estado Guardado', 'Estado Cargado', 'No Hay Datos Previos']};
-	window.optionNames = {'en': ['Select Area', 'Define Obstacles', 'Create Streams', 'Place Nodes', 'Validate Design', 'Apply Topology', 'SNEE'], 'es': ['Elegir \u00E1rea', 'Definir Obst\u00E1culos', 'Crear Streams', 'Ubicar Nodos', 'Validar Dise\u00F1o', 'Aplicar Topolog\u00EDa', 'SNEE']};
+	window.optionNames = {'en': ['Select Area', 'Define Obstacles', 'Create Streams', 'Place Nodes', 'Validate Design', 'Apply Topology Control', 'SNEE'], 'es': ['Elegir \u00E1rea', 'Definir Obst\u00E1culos', 'Crear Streams', 'Ubicar Nodos', 'Validar Dise\u00F1o', 'Aplicar Topolog\u00EDa', 'SNEE']};
 	window.optionDescriptions = {'en': ['This is the first step of the <span style="font-weight:bold;">"Wireless Sensor Network Deployment Design"</span> tool.<br /><br /> \
 		Choose the Area you want to work in and once you\'re comfortable, click on <span style="font-weight:bold;">Next</span>.<br />You can also click on <span style="font-weight:bold;">"Clear All"</span> to delete all nodes and obstacles previously created.<br /><br />To open back this \
 		Tooltip in case you close it, click on ',
@@ -1246,7 +1246,7 @@ function initializeVariables() {
 		<br /><br />On the upper right corner of the map you can upload a file with a set of GPS coordinates to help you place nodes massively.<br /><br />To open back this Tooltip in case you close it, click on ',
 		'Once the network is created, this tool helps you validate the design for connectivity issues, bottlenecks and single points of failure. You just have to click on the <span style="font-weight:bold;">Validate</span> button.<br /><br />Remember that the only validation that is mandatory to continue is the connectivity. \
 		The other ones serve only as warnings.<br /><br />If you have a design issue, you can hover over the crossmarks or admiration signs located on the menu at the upper right corner of the map to remember which nodes are causing the problem.<br /><br />To open back this Tooltip in case you close it, click on ',
-		'The <span style="font-weight:bold;">Apply Topology</span> step allows you to choose from four available algorithms to stablish the final topology of the deployment.<br /><br />Click on <span style="font-weight:bold;">Apply</span> to select the algorithm and preview the new topology on the map<br /><br />To open back this Tooltip in case you close it, click on ',
+		'The <span style="font-weight:bold;">Apply Topology Control</span> step allows you to choose from four available algorithms to stablish the final topology of the deployment.<br /><br />Click on <span style="font-weight:bold;">Apply</span> to select the algorithm and preview the new topology on the map<br /><br />To open back this Tooltip in case you close it, click on ',
 		'The <span style="font-weight:bold;">SNEE</span> step is the last step. Here you can visualize the XMLs created as a result of the previous steps, write your Snee query and, when ready, click on <span style="font-weight:bold;">GO TO SNEE</span>, which will let you download the result files.<br /><br />To open back this Tooltip in case you close it, click on '],
 		'es': ['\u00E9ste es el primer paso de la herramienta de <span style="font-weight:bold;">"Dise\u00F1o de Despliegue de Redes Inal\u00E1mbricas de Sensores"</span> tool.<br /><br /> \
 		Elija el \u00E1rea en el cual desea trabajar y una vez est\u00E9 c\u00F3modo, haga click en <span style="font-weight:bold;">Siguiente</span>.<br />Tambi\u00E9n puede hacer click en <span style="font-weight:bold;">"Borrar Todo"</span> para borrar todos los nodos y obst\u00E1culos previamente creados.<br /><br />Para abrir de nuevo \

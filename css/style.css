@@ -426,6 +426,9 @@ a {
 	height: 500px;
 	border: 1px solid #fff;
 }
+#contButtons {
+	width: 852px;
+}
 .button {
 	cursor: default;
 	border: 1px solid #fff;
