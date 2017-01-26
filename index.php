@@ -7,12 +7,15 @@
 		<link href='http://fonts.googleapis.com/css?family=Montserrat+Alternates' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css" />
 		<link type="text/css" href="css/style.css" rel="stylesheet" media="all" />
-		<script type="text/javascript" src="http://maps.google.com/maps/api/js?libraries=geometry,places&sensor=false&language=<?php
+		<script type="text/javascript" src="http://maps.google.com/maps/api/js?key=<?php
+		require_once 'auth/google_config.php';
+		echo $GoogleMapsAPIKey;
+		?>&libraries=geometry,places&sensor=false&language=<?php
 			$lang = "en";
 			if(isset($_GET['lang'])) $lang = $_GET['lang'];
 			echo $lang;
 		?>"></script>
-		<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
+		<script type="text/javascript" src="js/infobox.js"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
 		<?php

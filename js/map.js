@@ -1090,7 +1090,7 @@ function deleteMarker(i) {
 		window.markers[j].id--;
 		window.circles[j].id--;
 		var color = (window.markers[j].get('gateway') == '1') ? 'orange' : 'red';
-		window.markers[j].setIcon('http://gmaps-samples.googlecode.com/svn/trunk/markers/' + color + '/marker' + window.circles[j].id + '.png');
+		window.markers[j].setIcon('images/markers/' + color + '/marker' + window.circles[j].id + '.png');
 		window.nodesStreams[j] = window.nodesStreams[j+1];
 	}
 	delete window.nodesStreams[Object.keys(window.nodesStreams)[Object.keys(window.nodesStreams).length-1]];
@@ -1114,7 +1114,7 @@ function deleteBlockMarker(i) {
 	window.blockMarkers[val1][val2].setMap(null);
 	for(var j = (Number(val2)+1); j < window.blockMarkers[val1].length; ++j) {
 		window.blockMarkers[val1][j].id = (val1 + ',' + (j-1));
-		window.blockMarkers[val1][j].setIcon('http://gmaps-samples.googlecode.com/svn/trunk/markers/blue/marker' + j + '.png');
+		window.blockMarkers[val1][j].setIcon('images/markers/blue/marker' + j + '.png');
 	}
 	window.blockMarkers[val1].splice(val2, 1);
 	createBlocks();
@@ -1656,10 +1656,10 @@ function callMenu(marker) {
 	});
 	jQuery(gateNode).change(function() {
 		if(jQuery('input:checkbox[name=gate]:checked').val() == '1') {
-			marker.setIcon('http://gmaps-samples.googlecode.com/svn/trunk/markers/orange/marker' + marker.id + '.png');
+			marker.setIcon('images/markers/orange/marker' + marker.id + '.png');
 			marker.set('gateway', 1);
 		} else {
-			marker.setIcon('http://gmaps-samples.googlecode.com/svn/trunk/markers/red/marker' + marker.id + '.png');
+			marker.setIcon('images/markers/red/marker' + marker.id + '.png');
 			marker.set('gateway', 0);
 		}
 	});
@@ -1740,7 +1740,7 @@ function createMarker(e, lines, r, decrease, gateway, sensors, type) {
 			map: map,
 			id: window.counter,
 			draggable:true,
-			icon: 'http://gmaps-samples.googlecode.com/svn/trunk/markers/' + color + '/marker' + window.counter + '.png'
+			icon: 'images/markers/' + color + '/marker' + window.counter + '.png'
 		});
 		marker.set('type', type);
 		marker.set('gateway', gateway);
@@ -1844,7 +1844,7 @@ function createBlockMarker(e, valor, blocks) {
 		map: map,
 		id: (valor + ',' + (window.blockMarkers[valor].length)),
 		draggable: true,
-		icon: 'http://gmaps-samples.googlecode.com/svn/trunk/markers/blue/marker' + (window.blockMarkers[valor].length + 1) +'.png'
+		icon: 'images/markers/blue/marker' + (window.blockMarkers[valor].length + 1) +'.png'
 	});
 	google.maps.event.addListener(blockMarker, 'rightclick', function() {
 		callBlockMenu(blockMarker);

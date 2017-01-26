@@ -1,7 +1,7 @@
 #!/bin/bash
 cd ../XMLs
 username=${1}
-mv ${username}*.xml /home/david/SNEE-1.6.4-WSN-DD/etc
+mv ${username}*.xml ${SNEEROOT}/etc
 cd ${SNEEROOT}/etc
 cp wsn-dd.snee.properties ${username}.wsn-dd.snee.properties
 chmod 777 ${username}.wsn-dd.snee.properties
