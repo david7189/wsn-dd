@@ -149,9 +149,11 @@ function initialize() {
   			jQuery('#' + window.options[currentOption]).tooltip('open');
    });//.click();
 	var input = /** @type {HTMLInputElement} */(document.getElementById('place-div'));
+	//var input = document.getElementById('place-div');
 	map.controls[google.maps.ControlPosition.TOP].push(input);
 	map.controls[google.maps.ControlPosition.TOP_RIGHT].push(FullScreenControl(map, window.fullscreen[window.lang][0], window.fullscreen[window.lang][1]));
 	var searchBox = new google.maps.places.SearchBox(/** @type {HTMLInputElement} */(input));
+	//var searchBox = new google.maps.places.SearchBox('input');
    google.maps.event.addListener(searchBox, 'places_changed', function() {
    	var places = searchBox.getPlaces();
    	if (places.length == 0) {
@@ -2439,7 +2441,7 @@ function createNodesFromFile(string) {
 	window.nodeFileCoords = [];
 	var text = '<span style="font-weight: bold;">' + window.nodeFile[window.lang][2] + '</span><br /><br />';
 	text += '<div style="height: 120px; max-height: 120px; overflow-y: auto;">';
-	for(var i = 0; i < chain.length; i += 4) {
+	for(var i = 0; i < chain.length - Math.floor(chain.length % 4); i += 4) {
 		lat = chain[i].slice(0, 1) == 'N' ? parseFloat(chain[i].slice(1)) + chain[i+1]/60 : -1*(parseFloat(chain[i].slice(1)) + chain[i+1]/60);
 		lng = chain[i+2].slice(0, 1) == 'E' ? parseFloat(chain[i+2].slice(1)) + chain[i+3]/60 : -1*(parseFloat(chain[i+2].slice(1)) + chain[i+3]/60);
 		window.nodeFileCoords.push(new google.maps.LatLng(lat, lng));
