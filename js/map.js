@@ -188,6 +188,10 @@ function initialize() {
    setTimeout(function() {jQuery(input).css({'display': 'block'});}, 500);
    clickable();
    initialForm();
+   if(jQuery('#hello').next().text()) {
+		jQuery('#saveState').remove();
+		jQuery('#loadState').remove();
+   }
 }
 
 function clearAllB() {
@@ -245,7 +249,6 @@ function updateLastDate2() {
 		data: {'id_deploy': window.idDeploy, 'action': 'update_last_date'},
 		success: function(data){
 			if(data != 'OK') {
-				//console.log(data);
 				location.reload();
 			}
 		}
@@ -765,7 +768,6 @@ function loadDeployment() {
 						var loaded = JSON.parse(data.substring(0, data.length-1) + ']');
 						var select = '<option value="-1">------------------------------------</option>';
 						for(i = 0; i < loaded.length; ++i) {
-							console.log(loaded[i][11]);
 							select += '<option value="' + i + (loaded[i][11] != '-' ? '" disabled="disabled"' : '"') + '>' + loaded[i][1] + (loaded[i][11] != '-' ? ' (locked by ' + loaded[i][11] + ')' : '') + '</option>';
 						}
 						jQuery('#ini-load-d').html(select);
@@ -2628,10 +2630,10 @@ function manageStreams() {
 	jQuery(iamn2).addClass('iamn2').addClass('nextprev').html(window.arrows[window.lang][1]);
 	jQuery(prevNext).append(iamn2);
 	jQuery(iamp2).click(function() {
-	  jQuery('#iamp').click();	
+	  jQuery('#Obstacles').click();
 	});
 	jQuery(iamn2).click(function() {
-	  jQuery('#iamn').click();	
+	  jQuery('#Nodes').click();	
 	});
 	var divLeftC = document.createElement('div');
 	var divLeft = document.createElement('div');

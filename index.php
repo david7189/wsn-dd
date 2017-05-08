@@ -20,6 +20,11 @@
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
 		<?php
 			session_start();
+			if(isset($_GET['anonymous'])) {
+				$_SESSION['user_id'] = rand(1000000, 9999999);
+				$_SESSION['user_name'] = 'Anonymous';
+				$_SESSION['profile_pic_url'] = 'images/unknown_user.jpg';
+			}
 			if(isset($_GET['logout'])) {
 				unset($_SESSION['user_id']);
 				unset($_SESSION['user_name']);
@@ -130,7 +135,8 @@
 		?>
 				<div id="container-log">
 					<p>Please Connect Using your Google Account</p>
-					<p><a href="auth/auth.php"><img src="images/google-login-button.png"></p>
+					<p><a href="auth/auth.php"><img src="images/google-login-button.png" /></a></p>
+					<p><a class="anonymous" href="index.php?anonymous">Anonymous login</a></p>
 				</div>
 		<?php
 			}

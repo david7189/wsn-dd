@@ -17,6 +17,14 @@ body {
     text-align: center;
 	text-shadow: 1px 1px 0 #52663d;
 }
+.anonymous {
+  color: black;
+}
+.anonymous:hover {
+	text-decoration: underline;
+	font-weight: bold;
+	cursor: pointer;
+}
 .ini-opt-class, .ini-opt-class-2, .ini-opt-class-sub, #options-depl {
 	text-align: left;
 	font-weight: normal;
