@@ -40,17 +40,17 @@
 		chmod('../XMLs/' . $_SESSION['user_id'] . '_wsn-dd-physical-schema.xml', 0777);
 		chmod('../XMLs/' . $_SESSION['user_id'] . '_wsn-dd-logical-schema.xml', 0777);
 		chmod('../XMLs/' . $_SESSION['user_id'] . '_wsn-dd-nodes.xml', 0777);
-		$sortie = shell_exec('../shells/snee.sh ' . $_SESSION['user_id']);
-		$file = getenv('SNEEROOT') . '/' . $_SESSION['user_id'] . '_output/query1/';
+		$sortie = shell_exec('../shells/snee_new.sh ' . $_SESSION['user_id']);
+		$file = getenv('SNEEROOT') . '/' . $_SESSION['user_id'] . '_output/';
 		$file2 = $_SESSION['user_id'] . '_snee_files.rar';
 		if(strpos($sortie, '*O*K*') !== false && file_exists($file . $file2)) {
 			if(!copy($file . $file2, '../downloads/' . $file2) ||
-				!copy($file . 'query-plan/query1-DAF-1.png', '../downloads/' . $_SESSION['user_id'] . '_query1-DAF-1.png') ||
-				!copy($file . 'query-plan/query1-DLAF-1.png', '../downloads/' . $_SESSION['user_id'] . '_query1-DLAF-1.png') ||
-				!copy($file . 'query-plan/query1-LAF-1.png', '../downloads/' . $_SESSION['user_id'] . '_query1-LAF-1.png') ||
-				!copy($file . 'query-plan/query1-LAF\'-1.png', '../downloads/' . $_SESSION['user_id'] . '_query1-LAF\'-1.png') ||
-				!copy($file . 'query-plan/query1-PAF-1.png', '../downloads/' . $_SESSION['user_id'] . '_query1-PAF-1.png') ||
-				!copy($file . 'query-plan/query1-RT-1.png', '../downloads/' . $_SESSION['user_id'] . '_query1-RT-1.png')) {
+				!copy($file . 'query1/query-plan/query1-DAF-1.png', '../downloads/' . $_SESSION['user_id'] . '_query1-DAF-1.png') ||
+				!copy($file . 'query1/query-plan/query1-DLAF-1.png', '../downloads/' . $_SESSION['user_id'] . '_query1-DLAF-1.png') ||
+				!copy($file . 'query1/query-plan/query1-LAF-1.png', '../downloads/' . $_SESSION['user_id'] . '_query1-LAF-1.png') ||
+				!copy($file . 'query1/query-plan/query1-LAF\'-1.png', '../downloads/' . $_SESSION['user_id'] . '_query1-LAF\'-1.png') ||
+				!copy($file . 'query1/query-plan/query1-PAF-1.png', '../downloads/' . $_SESSION['user_id'] . '_query1-PAF-1.png') ||
+				!copy($file . 'query1/query-plan/query1-RT-1.png', '../downloads/' . $_SESSION['user_id'] . '_query1-RT-1.png')) {
 				echo "error!";
 			} else {
 				$sortie2 = shell_exec('../shells/snee_2.sh ' . $_SESSION['user_id']);

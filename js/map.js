@@ -148,15 +148,24 @@ function initialize() {
 		if(jQuery(this).prop('id') == window.options[currentOption])
   			jQuery('#' + window.options[currentOption]).tooltip('open');
    });//.click();
-	var input = /** @type {HTMLInputElement} */(document.getElementById('place-div'));
-	//var input = document.getElementById('place-div');
+	//var input = /** @type {HTMLInputElement} */(document.getElementById('place-div'));
+	var input = document.getElementById('place-div');
 	map.controls[google.maps.ControlPosition.TOP].push(input);
 	map.controls[google.maps.ControlPosition.TOP_RIGHT].push(FullScreenControl(map, window.fullscreen[window.lang][0], window.fullscreen[window.lang][1]));
-	var searchBox = new google.maps.places.SearchBox(/** @type {HTMLInputElement} */(input));
-	//var searchBox = new google.maps.places.SearchBox('input');
-   google.maps.event.addListener(searchBox, 'places_changed', function() {
+	//var searchBox = new google.maps.places.SearchBox(/** @type {HTMLInputElement} */(input));
+	var searchBox = new google.maps.places.SearchBox(input);
+    google.maps.event.addListener(searchBox, 'places_changed', function() {
    	var places = searchBox.getPlaces();
    	if (places.length == 0) {
+		if(jQuery('#place-div').val().indexOf('loc:') == -1) {
+			jQuery('#place-div').val('loc:' + jQuery('#place-div').val());
+			//google.maps.event.trigger(searchBox, 'places_changed');
+			google.maps.event.trigger(input, 'focus')
+			google.maps.event.trigger(input, 'keydown', {
+				keyCode: 13
+			});
+		}
+		//alert(jQuery('#place-div').val());
       	return;
     	}
     	var bounds = new google.maps.LatLngBounds();
@@ -173,12 +182,12 @@ function initialize() {
       map.fitBounds(bounds);
    });
    google.maps.event.addListener(map, 'bounds_changed', function() {
-   	var bounds = map.getBounds();
-   	searchBox.setBounds(bounds);
-  	});
-  	setTimeout(function() {jQuery(input).css({'display': 'block'});}, 500);
-	clickable();
-	initialForm();
+   	 var bounds = map.getBounds();
+   	 searchBox.setBounds(bounds);
+   });
+   setTimeout(function() {jQuery(input).css({'display': 'block'});}, 500);
+   clickable();
+   initialForm();
 }
 
 function clearAllB() {
@@ -574,9 +583,10 @@ function createDeployment(n, array) {
 		var conti = '<tr><td /><td><div id="submit-mod-d">' + window.iniForm[window.lang][7] + '</div></td></tr>';
 	}
 	jQuery(where).append('<table class="ini-opt-class"><tr><td>' + window.iniForm[window.lang][4] + '</td><td><input type="text" id="ini-opt-name" value="' + (array.length > 0 ? array[0] : '') + '" /></td></tr>\
-	<tr><td>' + window.iniForm[window.lang][5] + '</td><td><select id="ini-opt-deftype"></select></td></tr>\
 	<tr><td>' + window.iniForm[window.lang][6] + '</td><td><input type="text" id="ini-opt-budget" value="' + (array.length > 0 ? array[3] : '') + '" /><select id="ini-opt-budtype"><option value="GBP" ' + (array.length > 0 && array[2] == 'GBP' ? 'selected="selected"' : '') + '>GBP</option>\
-	<option value="COP" ' + (array.length > 0 && array[2] == 'COP' ? 'selected="selected"' : '') + '>COP</option><option value="USD" ' + (array.length > 0 && array[2] == 'USD' ? 'selected="selected"' : '') + '>USD</option><option value="EUR" ' + (array.length > 0 && array[2] == 'EUR' ? 'selected="selected"' : '') + '>EUR</option></select></td></tr>' + conti + '</table>');
+	<option value="COP" ' + (array.length > 0 && array[2] == 'COP' ? 'selected="selected"' : '') + '>COP</option><option value="USD" ' + (array.length > 0 && array[2] == 'USD' ? 'selected="selected"' : '') + '>USD</option><option value="EUR" ' + (array.length > 0 && array[2] == 'EUR' ? 'selected="selected"' : '') + '>EUR</option></select></td></tr>\
+	<tr><td>' + window.iniForm[window.lang][5] + '</td><td><select id="ini-opt-deftype"></select></td></tr>\
+	' + conti + '</table>');
 	window.loading.dialog('open');
 	jQuery.ajax({
 		url: 'ajax/data.php',
@@ -692,7 +702,6 @@ function createDeployment(n, array) {
 												url: 'ajax/data.php',
 												data: {'action': 'load_sensors'},
 												success: function(data) {
-													console.log('sensores: ' + data);
 													window.loading.dialog('close');
 													var sensors = JSON.parse(data.substring(0, data.length-1) + ']');
 													jQuery.each(sensors, function(index, value) {
@@ -850,7 +859,6 @@ function loadDeployment() {
 									url: 'ajax/data.php',
 									data: {'action': 'load_sensors'},
 									success: function(data) {
-										console.log('sensores: ' + data);
 										window.loaded4 = true;
 										checkLoaded();
 										var sensors = JSON.parse(data.substring(0, data.length-1) + ']');
@@ -1350,8 +1358,8 @@ function initializeVariables() {
 	});
 	window.manS = jQuery('#manage-str-div').dialog({
 		autoOpen: false,
-		height: 300,
-		width: 394,
+		height: 340,
+		width: 396,
 		resizable: false,
 		closeOnEscape: false,
 		modal: true
@@ -2608,6 +2616,23 @@ function deleteStream() {
 }
 
 function manageStreams() {
+	var prevNext = document.createElement('div');
+	jQuery(prevNext).css({'height': '24px', 'text-align': 'center', 'width': '387px', 'font-weight': 'bold'});
+	iamp2 = document.createElement('span');
+	jQuery(iamp2).addClass('iamp2').addClass('nextprev').html(window.arrows[window.lang][0]);
+	jQuery(prevNext).append(iamp2);
+	jQuery(prevNext).append(' | ');
+	iamn2 = document.createElement('span');
+	breakLine = document.createElement('p');
+	jQuery(breakLine).addClass('clear');
+	jQuery(iamn2).addClass('iamn2').addClass('nextprev').html(window.arrows[window.lang][1]);
+	jQuery(prevNext).append(iamn2);
+	jQuery(iamp2).click(function() {
+	  jQuery('#iamp').click();	
+	});
+	jQuery(iamn2).click(function() {
+	  jQuery('#iamn').click();	
+	});
 	var divLeftC = document.createElement('div');
 	var divLeft = document.createElement('div');
 	jQuery(divLeft).addClass('str-divs');
@@ -2718,6 +2743,9 @@ function manageStreams() {
 	jQuery(divLeftC).append(deleteS);
 	jQuery('#manage-str-d').append(divLeftC);
 	jQuery('#manage-str-d').append(divRight);
+	jQuery('#manage-str-d').append(divRight);
+	jQuery('#manage-str-d').append(breakLine);
+	jQuery('#manage-str-d').append(prevNext);
 	loadStreams();
 }
 
@@ -2914,6 +2942,9 @@ function xmlQuery() {
 	jQuery('.chQuery').on('change', function() {
 		xmlQuery2();
 	});
+	jQuery('.chQuery').on('keyup', function() {
+		xmlQuery2();
+	});
 }
 
 function xmlQ() {
@@ -3025,7 +3056,22 @@ function XMLs() {
 	divOpt.id = 'query_area';
 	jQuery(divOpt).html(window.xmls2[window.lang][0] + ': <input class="chQuery" style="width: 60px;" id="deli-time" type="number" value="600" step="1" max="10000" min="1" name="deli-time">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
 	window.xmls2[window.lang][1] + ': <input class="chQuery" style="width: 50px;" id="min-inter" type="number" value="10" step="1" max="1000" min="1" name="min-time">');
-	jQuery(divOpt).children().keydown(function (e) { e.preventDefault(); });
+	//jQuery(divOpt).children().keydown(function (e) { e.preventDefault(); });
+	jQuery(divOpt).children().keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+             // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) || 
+             // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+                 // let it happen, don't do anything
+                 return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
 	jQuery(divOpt).css({'width': '780px'});
 	jQuery('#snee-text').append(divOpt);
 	jQuery('#snee-text').append(xml_area);
