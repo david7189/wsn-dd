@@ -34,5 +34,5 @@ if [[ ${firstLine} == *"Attributes for "* ]]; then
 		echo "ERROR QUERY"
 	fi
 else
-  echo $(cat ${SNEEROOT}/logs/snee.log)
+  echo "$(cat ${SNEEROOT}/logs/snee.log)"
 fi

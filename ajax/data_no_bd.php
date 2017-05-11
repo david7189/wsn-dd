@@ -40,7 +40,8 @@
 		chmod('../XMLs/' . $_SESSION['user_id'] . '_wsn-dd-physical-schema.xml', 0777);
 		chmod('../XMLs/' . $_SESSION['user_id'] . '_wsn-dd-logical-schema.xml', 0777);
 		chmod('../XMLs/' . $_SESSION['user_id'] . '_wsn-dd-nodes.xml', 0777);
-		$sortie = shell_exec('../shells/snee_new.sh ' . $_SESSION['user_id']);
+		//$sortie = shell_exec('../shells/snee_new.sh ' . $_SESSION['user_id']);
+		$sortie = exec('../shells/snee_new.sh ' . $_SESSION['user_id']);
 		$file = getenv('SNEEROOT') . '/' . $_SESSION['user_id'] . '_output/';
 		$file2 = $_SESSION['user_id'] . '_snee_files.rar';
 		if(strpos($sortie, '*O*K*') !== false && file_exists($file . $file2)) {
