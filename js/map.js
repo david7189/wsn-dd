@@ -188,7 +188,7 @@ function initialize() {
    setTimeout(function() {jQuery(input).css({'display': 'block'});}, 500);
    clickable();
    initialForm();
-   if(jQuery('#hello').next().text()) {
+   if(jQuery('#hello').next().text() == 'Anonymous') {
 		jQuery('#saveState').remove();
 		jQuery('#loadState').remove();
    }
