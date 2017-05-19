@@ -28,6 +28,7 @@ chmod -R 777 ${SNEEROOT}/${username}_output/query1
 touch ${SNEEROOT}/${username}_result.txt
 chmod 777 ${SNEEROOT}/${username}_result.txt
 query="$(head -n 1 ${SNEEROOT}/etc/${username}_wsn-dd-query.xml)"
+unset DISPLAY
 java -Xmx1024m uk/ac/manchester/cs/snee/client/SampleClient "etc/${username}.wsn-dd.snee.properties" "${query}" 120 "etc/${username}_wsn-dd-query-parameters.xml" null > ${username}_result.txt
 firstLine=$(head -n 1 ${SNEEROOT}/${username}_result.txt)
 echo ${firstLine} "${query}"
