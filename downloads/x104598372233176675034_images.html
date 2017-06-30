@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+				<html>
+					<head>
+					<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+					<script type="text/javascript" src="../js/data_no_bd.js"></script>
+					<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css"> 
+					<title>Wireless Sensor Network Deployment Design</title>
+					<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+					<link rel="icon" href="../images/favicon/favicon.ico" />
+					<style>
+					  #cuerpo {
+						background-color: #CCFF99;
+					  }
+					  #tabla_img {
+						border-radius: 4px;
+						margin: auto;
+						width: 50%;
+						border: 1px solid #AAAAAA;
+						padding: 10px;
+						background-color: #FFFFFF;
+						width: 1000px;
+						text-align: center;
+					  }
+					  #tabla_img td {
+						text-align: center;
+						padding: 10px;
+					  }
+					  #tabla_img span {
+						font-family: Verdana,Arial,sans-serif;
+						font-size: 14px;
+						font-weight: bold;
+						line-height: 10px;
+					  }
+					  #tabla_img div {
+						margin: auto;
+					  }
+					  #tabla_img img {
+						margin: auto;
+					  }
+					  #tabla_img .txt_normal {
+						font-weight: normal;
+					  }
+					  #tabla_img .codigo {
+						font-family: Unicode;
+					  }
+					  .boton {
+						box-shadow: inset -1px -1px 8px #a8a8a8;
+						background-color: #dcdcdc;
+						margin: 0;
+						text-shadow: none;
+						font-family: Roboto;
+						font-size: 15px;
+						font-weight: 400;
+						border: 2px solid #3f3f3f;
+						width: 240px;
+						text-align: center;
+						height: 30px;
+						line-height: 30px;
+						border-radius: 8px;
+						padding: 0 11px 0 13px;
+						cursor: pointer;
+						color: #3f3f3f;
+						}
+					  </style>
+					</head>
+					<body id="cuerpo">
+					  <table id="tabla_img">
+						<tr>
+						  <td colspan="2">
+							<div class="boton" id="download_src">DOWNLOAD SOURCE CODE</div>
+						  </td>
+						</tr>
+					    <tr>
+						  <td colspan="2">
+							<span>SQL QUERY:</span>
+						  </td>
+						</tr>
+						<tr>
+						  <td colspan="2">
+							<span class="txt_normal codigo">SELECT * FROM MiStream[NOW];</span>
+						  </td>
+						</tr>
+					    <tr>
+						  <td colspan="2">
+							<span>QoS PARAMETERS:</span>
+						  </td>
+						</tr><tr>
+						  <td><span class="txt_normal">Acquisition interval (ms):</span></td>
+						  <td><span class="txt_normal">10000</span></td>
+					    <tr><tr>
+						  <td><span class="txt_normal">Buffering factor:</span></td>
+						  <td><span class="txt_normal">55</span></td>
+					    <tr><tr>
+						  <td><span class="txt_normal">Delivery time (ms):</span></td>
+						  <td><span class="txt_normal">594922</span></td>
+					    <tr><tr>
+						  <td><span class="txt_normal">Total energy consumption (J):</span></td>
+						  <td><span class="txt_normal">52116</span></td>
+					    <tr><tr>
+						  <td><span class="txt_normal">Lifetime (days):</span></td>
+						  <td><span class="txt_normal">499.7</span></td>
+					    <tr><tr>
+						  <td colspan="2">
+							<span>LOGICAL ALGEBRAIC FORM (AFTER TRANSLATION):</span>
+						  </td>
+						</tr>
+					    <tr>
+						  <td colspan="2">
+							<img src="x104598372233176675034_query1-LAF-1.png" />
+						  </td>
+						</tr>
+						<tr>
+						  <td colspan="2">
+							<span>LOGICAL ALGEBRAIC FORM (AFTER REWRITING):</span>
+						  </td>
+						<tr>
+						  <td colspan="2">
+							<img src="x104598372233176675034_query1-LAF'-1.png" />
+						  </td>
+						</tr>
+						<tr>
+						  <td colspan="2">
+							<span>PHYSICAL ALGEBRAIC FORM:</span>
+						  </td>
+						<tr>
+						<tr>
+						  <td colspan="2">
+							<img src="x104598372233176675034_query1-PAF-1.png" />
+						  </td>
+						</tr>
+						<tr>
+						  <td colspan="2">
+							<span>DISTRIBUTED LOGICAL ALGEBRAIC FORM:</span>
+						  </td>
+						<tr>
+						<tr>
+						  <td colspan="2">
+							<img src="x104598372233176675034_query1-DLAF-1.png" />
+						  </td>
+						</tr>
+						<tr>
+						  <td colspan="2">
+							<span>ROUTING TREE:</span>
+						  </td>
+						<tr>
+						<tr>
+						  <td colspan="2">
+							<img src="x104598372233176675034_query1-RT-1.png" />
+						  </td>
+						</tr>
+						<tr>
+						  <td colspan="2">
+							<span>DISTRIBUTED ALGEBRAIC FORM:</span>
+						  </td>
+						<tr>
+						<tr>
+						  <td colspan="2">
+							<img src="x104598372233176675034_query1-DAF-1.png" />
+						  </td>
+						</tr>
+						<tr>
+						  <td colspan="2">
+							<span>AGENDA:</span>
+						  </td>
+						<tr>
+						<tr>
+						  <td colspan="2">
+							<img src="x104598372233176675034_query1-Agenda.png" />
+						  </td>
+						</tr>
+					  </table>
+					</body>
+				</html>

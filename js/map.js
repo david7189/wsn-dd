@@ -2951,7 +2951,7 @@ function xmlQuery() {
 
 function xmlQ() {
 	if(window.xmlQu == '') {
-		window.xmlQu = window.xmls2[window.lang][3];
+		window.xmlQu = 'SELECT * FROM ' + Object.keys(window.streams)[0] + '[NOW];';//window.xmls2[window.lang][3];
 	}
 	jQuery('#query_area').hide();
 	jQuery('#xml_area').css({'height': '440px'}).prop('readonly', false).val(window.xmlQu);
@@ -2990,15 +2990,15 @@ function goToSnee() {
 				} else if(data.indexOf('*O*K*') <= -1) {
 					alert(data);
 				} else {
-					jQuery('.download_snee').each(function() {
-						jQuery(this).remove();
-					});
-					var a = document.createElement('a');
-					a.className = 'download_snee';
-					a.href = 'downloads/' + data.substring(5) + '_snee_files.rar';
-					a.download = 'snee_files.rar';
-					jQuery('#snee-dialog').append(a);
-					jQuery(a)[0].click();
+					//jQuery('.download_snee').each(function() {
+					//	jQuery(this).remove();
+					//});
+					//var a = document.createElement('a');
+					//a.className = 'download_snee';
+					//a.href = 'downloads/' + data.substring(5) + '_snee_files.rar';
+					//a.download = 'snee_files.rar';
+					//jQuery('#snee-dialog').append(a);
+					//jQuery(a)[0].click();
 					window.open('downloads/' + data.substring(5) + '_images.html', '_blank');
 				}
 			}
@@ -3043,7 +3043,7 @@ function XMLs() {
 	jQuery(xml_area).prop('wrap', 'off');
 	xml_area.id = 'xml_area';
 	jQuery(xml_area).css({'resize': 'none', 'background-color': '#eeefff', 'width': '780px', 'max-width': '780px', 'overflow-x': 'auto', 'height': '420px', 'max-height': '420px', 'overflow-y': 'auto', 'font-family': 'monospace', 'padding': '4px', 'color': '#800000'});
-	jQuery(xml_area).on('click keydown', function() {
+	/*jQuery(xml_area).on('click keydown', function() {
 		if(jQuery(this).val() == window.xmls2[window.lang][3]) {
 			jQuery(this).val('');
 		}
@@ -3052,7 +3052,7 @@ function XMLs() {
 		if(jQuery(this).val() == '') {
 			jQuery(this).val(window.xmls2[window.lang][3]);
 		}
-	});
+	});*/
 	var divOpt = document.createElement('p');
 	jQuery(divOpt).css({'font-weight': 'normal'});
 	divOpt.id = 'query_area';

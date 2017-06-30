@@ -37,6 +37,8 @@ if [[ ${firstLine} == *"Attributes for "* ]]; then
 	number=$(ls -1 ${SNEEROOT}/${username}_output/query1/query-plan/* | wc -l)
 	if [ ${number} -gt 0 ]; then
 		chmod -R 777 ${SNEEROOT}/${username}_output/query1/*
+		#rar a -ep1 ${SNEEROOT}/${username}_output/${username}_snee_files.rar ${SNEEROOT}/${username}_output/query1/* >/dev/null
+		cd ${SNEEROOT}
 		rar a -ep1 ${SNEEROOT}/${username}_output/${username}_snee_files.rar ${SNEEROOT}/${username}_output/query1/* >/dev/null
 		chmod 777 ${SNEEROOT}/${username}_output/${username}_snee_files.rar
 		echo "*O*K*"

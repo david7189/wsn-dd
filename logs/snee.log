@@ -1,0 +1,8 @@
+2017-01-11 23:02:05,852 [main]  INFO uk.ac.manchester.cs.snee.SNEEController - ENTER SNEEController() properties file etc/wsn-dd.snee.properties
+2017-01-11 23:02:05,853 [main]  INFO uk.ac.manchester.cs.snee.SNEEController - 
+2017-01-11 23:02:05,887 [main]  INFO uk.ac.manchester.cs.snee.metadata.schema.Types - Types successfully read in from /home/david/SNEE-1.6.4-WSN-DD/etc/Types.xml
+2017-01-11 23:02:05,892 [main]  WARN uk.ac.manchester.cs.snee.metadata.MetadataManager - Old schema declaration used for stream. You should update your schema to use push_stream or pull_stream as appropriate.
+2017-01-11 23:02:05,892 [main]  INFO uk.ac.manchester.cs.snee.metadata.MetadataManager - Logical schema successfully read in from /home/david/SNEE-1.6.4-WSN-DD/etc/wsn-dd-logical-schema.xml. Number of extents=1
+	Extents: [seadefence]
+2017-01-11 23:02:05,898 [main] FATAL uk.ac.manchester.cs.snee.SNEEController - Problem instantiating physical schema etc/wsn-dd-physical-schema.xml. uk.ac.manchester.cs.snee.metadata.source.SourceMetadataException: More than one gateway node specified for sensor network Test1; this is currently not supported.
+2017-01-11 23:02:05,899 [main] FATAL uk.ac.manchester.cs.snee.client.SampleClient - uk.ac.manchester.cs.snee.SNEEException: Problem instantiating physical schema etc/wsn-dd-physical-schema.xml. uk.ac.manchester.cs.snee.metadata.source.SourceMetadataException: More than one gateway node specified for sensor network Test1; this is currently not supported.
