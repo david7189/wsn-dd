@@ -5,8 +5,8 @@ function initialize() {
 	  });
 	  var a = document.createElement('a');
 	  a.className = 'download_snee';
-	  a.href = '../downloads/snee_files.rar';
-	  a.download = 'snee_files.rar';
+	  a.href = '../downloads/snee_files.tar.gz';
+	  a.download = 'snee_files.tar.gz';
 	  jQuery(document.body).append(a);
 	  jQuery(a)[0].click();
 	});

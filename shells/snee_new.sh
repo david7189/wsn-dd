@@ -39,8 +39,9 @@ if [[ ${firstLine} == *"Attributes for "* ]]; then
 		chmod -R 777 ${SNEEROOT}/${username}_output/query1/*
 		#rar a -ep1 ${SNEEROOT}/${username}_output/${username}_snee_files.rar ${SNEEROOT}/${username}_output/query1/* >/dev/null
 		cd ${SNEEROOT}
-		rar a -ep1 ${SNEEROOT}/${username}_output/${username}_snee_files.rar ${SNEEROOT}/${username}_output/query1/* >/dev/null
-		chmod 777 ${SNEEROOT}/${username}_output/${username}_snee_files.rar
+		tar -zcvf ${SNEEROOT}/${username}_output/${username}_snee_files.tar.gz -C ${SNEEROOT}/${username}_output/query1 .
+		#rar a -ep1 ${SNEEROOT}/${username}_output/${username}_snee_files.rar ${SNEEROOT}/${username}_output/query1/* >/dev/null
+		chmod 777 ${SNEEROOT}/${username}_output/${username}_snee_files.tar.gz
 		echo "*O*K*"
 	else
 		echo "ERROR QUERY"
